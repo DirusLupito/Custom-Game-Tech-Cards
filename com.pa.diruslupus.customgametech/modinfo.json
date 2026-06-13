@@ -1,0 +1,35 @@
+{
+  "context": "server",
+  "identifier": "com.pa.diruslupus.customgametech",
+  "display_name": "Custom Game Tech Companion",
+  "description": "Server-distributed UI companion for manually patched Custom Game Tech servers. Ships the custom lobby tech-card UI files to clients.",
+  "author": "diruslupus",
+  "version": "0.2.0",
+  "build": "124627",
+  "date": "2026-06-13",
+  "signature": "not yet implemented",
+  "priority": 100,
+  "scenes": {
+    "new_game": [
+      "coui://ui/mods/com.pa.diruslupus.customgametech/companion_verifier.js"
+    ],
+    "live_game": [
+      "coui://ui/mods/com.pa.diruslupus.customgametech/companion_verifier.js"
+    ],
+    "live_game_action_bar": [
+      "coui://ui/mods/com.pa.diruslupus.customgametech/companion_verifier.js"
+    ],
+    "live_game_build_bar": [
+      "coui://ui/mods/com.pa.diruslupus.customgametech/companion_verifier.js"
+    ],
+    "gw_reconnect_loading": [
+      "coui://ui/mods/com.pa.diruslupus.customgametech/companion_verifier.js"
+    ]
+  },
+  "category": [
+    "server",
+    "titans",
+    "ui",
+    "gameplay"
+  ]
+}

@@ -1,0 +1,5743 @@
+var model;
+var handlers = {};
+
+$(document).ready(function()
+{
+    var DEFAULT_GW_TECH_LOADOUT = 'gwc_start_vehicle';
+    var VANILLA_GW_TECH_LOADOUT = 'gwc_start_vanilla';
+    var GWO_MOD_IDENTIFIER = 'com.pa.quitch.gwaioverhaul';
+    var GWO_LOADOUT_IDS = [
+        'gwaio_start_ceo',
+        'gwaio_start_paratrooper',
+        'nem_start_deepspace',
+        'nem_start_nuke',
+        'nem_start_planetary',
+        'nem_start_tower_rush',
+        'gwaio_start_tourist',
+        'gwaio_start_rapid',
+        'tgw_start_speed',
+        'tgw_start_tank',
+        'gwaio_start_nomad',
+        'gwaio_start_backpacker',
+        'gwaio_start_hoarder',
+        'gwaio_start_warp',
+        'gwaio_start_terminal',
+        'gwaio_start_lucky',
+        'gwaio_start_naval'
+    ];
+    var GWO_TECH_CARD_IDS = [
+        'gwaio_anti_air',
+        'gwaio_anti_bots',
+        'gwaio_anti_commander',
+        'gwaio_anti_hover',
+        'gwaio_anti_orbital',
+        'gwaio_anti_sea',
+        'gwaio_anti_structure',
+        'gwaio_anti_vehicles',
+        'gwaio_combat_titans',
+        'gwaio_cooldown_air',
+        'gwaio_cooldown_bots',
+        'gwaio_cooldown_orbital',
+        'gwaio_cooldown_sea',
+        'gwaio_cooldown_vehicles',
+        'gwaio_damage_titans',
+        'gwaio_enable_bounties',
+        'gwaio_enable_eradication',
+        'gwaio_enable_factories_t1_all',
+        'gwaio_enable_landanywhere',
+        'gwaio_enable_orbitalbombardment',
+        'gwaio_enable_planetaryradar',
+        'gwaio_enable_suddendeath',
+        'gwaio_enable_tsunami',
+        'gwaio_health_titans',
+        'gwaio_protocol_agility',
+        'gwaio_protocol_blindness',
+        'gwaio_protocol_disposability',
+        'gwaio_protocol_fortitude',
+        'gwaio_protocol_killswitch',
+        'gwaio_protocol_precision',
+        'gwaio_protocol_wrath',
+        'gwaio_speed_structure',
+        'gwaio_speed_titans',
+        'gwaio_upgrade_advancedairfactory',
+        'gwaio_upgrade_advancedbotfactory',
+        'gwaio_upgrade_advancedenergyplant',
+        'gwaio_upgrade_advancedfabricationaircraft',
+        'gwaio_upgrade_advancedfabricationbot',
+        'gwaio_upgrade_advancedfabricationship',
+        'gwaio_upgrade_advancedfabricationvehicle',
+        'gwaio_upgrade_advancedlaserdefensetower',
+        'gwaio_upgrade_advancedmetalextractor',
+        'gwaio_upgrade_advancednavalfactory',
+        'gwaio_upgrade_advancedradar',
+        'gwaio_upgrade_advancedradarsatellite',
+        'gwaio_upgrade_advancedtorpedolauncher',
+        'gwaio_upgrade_advancedvehiclefactory',
+        'gwaio_upgrade_airfactory',
+        'gwaio_upgrade_anchor',
+        'gwaio_upgrade_angel',
+        'gwaio_upgrade_ant',
+        'gwaio_upgrade_antinuke',
+        'gwaio_upgrade_ares',
+        'gwaio_upgrade_arkyd',
+        'gwaio_upgrade_artemis',
+        'gwaio_upgrade_astraeus',
+        'gwaio_upgrade_atlas',
+        'gwaio_upgrade_avenger',
+        'gwaio_upgrade_barnacle',
+        'gwaio_upgrade_barracuda',
+        'gwaio_upgrade_bluehawk',
+        'gwaio_upgrade_boom',
+        'gwaio_upgrade_botfactory',
+        'gwaio_upgrade_bumblebee',
+        'gwaio_upgrade_catalyst',
+        'gwaio_upgrade_catapult',
+        'gwaio_upgrade_colonel',
+        'gwaio_upgrade_dox',
+        'gwaio_upgrade_drifter',
+        'gwaio_upgrade_energyplant',
+        'gwaio_upgrade_energystorage',
+        'gwaio_upgrade_fabricationaircraft',
+        'gwaio_upgrade_fabricationbot',
+        'gwaio_upgrade_fabricationship',
+        'gwaio_upgrade_fabricationvehicle',
+        'gwaio_upgrade_firefly',
+        'gwaio_upgrade_flak',
+        'gwaio_upgrade_galata',
+        'gwaio_upgrade_gile',
+        'gwaio_upgrade_grenadier',
+        'gwaio_upgrade_halley',
+        'gwaio_upgrade_helios',
+        'gwaio_upgrade_hermes',
+        'gwaio_upgrade_holkins',
+        'gwaio_upgrade_hornet',
+        'gwaio_upgrade_horsefly',
+        'gwaio_upgrade_hummingbird',
+        'gwaio_upgrade_icarus',
+        'gwaio_upgrade_inferno',
+        'gwaio_upgrade_jig',
+        'gwaio_upgrade_kaiju',
+        'gwaio_upgrade_kessler',
+        'gwaio_upgrade_kestrel',
+        'gwaio_upgrade_kraken',
+        'gwaio_upgrade_laserdefensetower',
+        'gwaio_upgrade_leveler',
+        'gwaio_upgrade_leviathan',
+        'gwaio_upgrade_lob',
+        'gwaio_upgrade_locusts',
+        'gwaio_upgrade_manhattan',
+        'gwaio_upgrade_mend',
+        'gwaio_upgrade_metalextractor',
+        'gwaio_upgrade_metalstorage',
+        'gwaio_upgrade_mine',
+        'gwaio_upgrade_narwhal',
+        'gwaio_upgrade_navalfactory',
+        'gwaio_upgrade_nukes',
+        'gwaio_upgrade_nyx',
+        'gwaio_upgrade_omega',
+        'gwaio_upgrade_orbitalfabricationbot',
+        'gwaio_upgrade_orbitalfactory',
+        'gwaio_upgrade_orbitallauncher',
+        'gwaio_upgrade_orca',
+        'gwaio_upgrade_pelican',
+        'gwaio_upgrade_pelter',
+        'gwaio_upgrade_phoenix',
+        'gwaio_upgrade_piranha',
+        'gwaio_upgrade_planetaryradar',
+        'gwaio_upgrade_radar',
+        'gwaio_upgrade_radarjammer',
+        'gwaio_upgrade_ragnarok',
+        'gwaio_upgrade_sheller',
+        'gwaio_upgrade_singlelaserdefensetower',
+        'gwaio_upgrade_skitter',
+        'gwaio_upgrade_slammer',
+        'gwaio_upgrade_solararray',
+        'gwaio_upgrade_spark',
+        'gwaio_upgrade_spinner',
+        'gwaio_upgrade_squall',
+        'gwaio_upgrade_stinger',
+        'gwaio_upgrade_stingray',
+        'gwaio_upgrade_stitch',
+        'gwaio_upgrade_storm',
+        'gwaio_upgrade_stryker',
+        'gwaio_upgrade_subcommander_duplication',
+        'gwaio_upgrade_subcommander_fabber',
+        'gwaio_upgrade_subcommander_tactics',
+        'gwaio_upgrade_sxx',
+        'gwaio_upgrade_teleporter',
+        'gwaio_upgrade_torpedolauncher',
+        'gwaio_upgrade_typhoon',
+        'gwaio_upgrade_ubercannon_structure',
+        'gwaio_upgrade_umbrella',
+        'gwaio_upgrade_unitcannon',
+        'gwaio_upgrade_vanguard',
+        'gwaio_upgrade_vehiclefactory',
+        'gwaio_upgrade_wall',
+        'gwaio_upgrade_ward',
+        'gwaio_upgrade_wyrm',
+        'gwaio_upgrade_zeus',
+        'gwc_cost_intel',
+        'gwc_energy_efficiency_intel',
+        'gwc_energy_efficiency_weapons'
+    ];
+    var GWO_CARDS_GRANTING_ADVANCED_TECH = [
+        'gwc_enable_air_all',
+        'gwc_enable_bots_all',
+        'gwc_enable_sea_all',
+        'gwc_enable_vehicles_all',
+        'gwaio_upgrade_fabricationaircraft',
+        'gwaio_upgrade_fabricationbot',
+        'gwaio_upgrade_fabricationship',
+        'gwaio_upgrade_fabricationvehicle',
+        'gwaio_start_hoarder'
+    ];
+    var GW_TECH_CARD_EXCLUDES = {
+        gwc_add_card_slot: true,
+        gwc_minion: true
+    };
+    var GW_TECH_FAKE_GALAXY = {
+        stars: function() {
+            return _.range(0, 12);
+        }
+    };
+    var GW_TECH_FAKE_STAR = {
+        distance: function() {
+            return 1;
+        }
+    };
+    var REQUIRED_CLIENT_MODS_SESSION_KEY = 'gw_required_client_mod_identifiers';
+    var REQUIRED_GW_SCENE_KEYS = ['gw_war_over', 'gw_play', 'gw_start'];
+    var REQUIRED_GW_DESCRIPTION_PHRASE = 'galactic war';
+    var UNIT_LIST_PATH = '/pa/units/unit_list.json';
+    var GW_TECH_PRESETS_STORAGE_KEY = 'gw_custom_lobby_tech_presets_v1';
+
+    var normalizeGwTechSlotCount = function(value) {
+        var count = Math.floor(Number(value));
+        if (!_.isFinite(count) || count < 0) {
+            return 0;
+        }
+
+        return count;
+    };
+
+    var isGwTechLoadoutId = function(loadout) {
+        return _.isString(loadout) && (loadout.indexOf('gwc_start') === 0 || loadout.indexOf('_start_') >= 0 || _.includes(GWO_LOADOUT_IDS, loadout));
+    };
+
+    var isGwTechCardId = function(cardId) {
+        return _.isString(cardId) && !isGwTechLoadoutId(cardId);
+    };
+
+    var normalizeGwTechLoadout = function(loadout) {
+        if (isGwTechLoadoutId(loadout)) {
+            return loadout;
+        }
+
+        return DEFAULT_GW_TECH_LOADOUT;
+    };
+
+    var isVanillaGwTechLoadout = function(loadout) {
+        return loadout === VANILLA_GW_TECH_LOADOUT;
+    };
+
+    var makeVanillaGwTechLoadoutCard = function() {
+        return {
+            icon: ko.observable('coui://ui/main/game/galactic_war/shared/img/red-commander.png'),
+            summary: ko.observable('!LOC:Vanilla Commander'),
+            desc: ko.observable('!LOC:Normal base-game commander. Uses the full normal unit tree with no Galactic War loadout, no buffs, no nerfs, and no selectable tech-card slots.'),
+            locDesc: ko.computed(function() {
+                return loc('!LOC:Normal base-game commander. Uses the full normal unit tree with no Galactic War loadout, no buffs, no nerfs, and no selectable tech-card slots.');
+            }),
+            visible: ko.observable(true)
+        };
+    };
+
+    var unwrapGwTechValue = function(value) {
+        return _.isFunction(value) ? value() : value;
+    };
+
+    var stripGwTechHtml = function(value) {
+        if (!_.isString(value)) {
+            value = _.isUndefined(value) || value === null ? '' : String(value);
+        }
+
+        return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    };
+
+    var normalizeGwTechSearchText = function(value) {
+        return stripGwTechHtml(value).toLowerCase();
+    };
+
+    var getGwTechCardSummaryText = function(card) {
+        if (!card) {
+            return '';
+        }
+
+        return stripGwTechHtml(loc(unwrapGwTechValue(card.summary) || ''));
+    };
+
+    var getGwTechCardDescriptionText = function(card) {
+        if (!card) {
+            return '';
+        }
+
+        if (!_.isUndefined(card.locDesc)) {
+            return stripGwTechHtml(unwrapGwTechValue(card.locDesc) || '');
+        }
+
+        return stripGwTechHtml(loc(unwrapGwTechValue(card.desc) || ''));
+    };
+
+    function GwTechPickerOptionViewModel(option, enabled) {
+        var self = this;
+
+        if (!option || !_.isString(option.id) || !option.card) {
+            console.log('[GW TECH] Invalid tech picker option: ' + JSON.stringify(option || {}));
+        }
+
+        self.id = option && option.id;
+        self.card = option && option.card;
+        self.enabled = _.isUndefined(enabled) ? true : !!enabled;
+        self.summaryText = ko.computed(function() {
+            return getGwTechCardSummaryText(self.card);
+        });
+        self.descText = ko.computed(function() {
+            return getGwTechCardDescriptionText(self.card);
+        });
+        self.searchText = ko.computed(function() {
+            return normalizeGwTechSearchText([self.id || '', self.summaryText(), self.descText()].join(' '));
+        });
+        self.matchesSearch = function(search) {
+            var needle = normalizeGwTechSearchText(search || '');
+            if (!needle) {
+                return true;
+            }
+
+            return self.searchText().indexOf(needle) >= 0;
+        };
+    }
+
+    var normalizeGwTechPresetName = function(name) {
+        if (!_.isString(name)) {
+            name = _.isUndefined(name) || name === null ? '' : String(name);
+        }
+
+        return stripGwTechHtml(name).slice(0, 80);
+    };
+
+    var normalizeGwTechPresetLoadout = function(loadout) {
+        return _.isString(loadout) ? loadout : '';
+    };
+
+    var normalizeGwTechPresetCards = function(cards) {
+        var result = [];
+
+        _.forEach(cards || [], function(card) {
+            if (_.isString(card)) {
+                result.push(card);
+            }
+        });
+
+        return result;
+    };
+
+    var makeGwTechPresetId = function() {
+        return 'preset-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
+    };
+
+    var normalizeGwTechPreset = function(preset) {
+        var now = Date.now();
+        var loadout = normalizeGwTechPresetLoadout(preset && preset.loadout);
+        var cards = normalizeGwTechPresetCards(preset && preset.cards);
+        var name = normalizeGwTechPresetName(preset && preset.name);
+
+        return {
+            id: _.isString(preset && preset.id) && preset.id.length ? preset.id : makeGwTechPresetId(),
+            name: name || 'Unnamed Preset',
+            loadout: loadout,
+            cards: cards,
+            created_at: _.isFinite(Number(preset && preset.created_at)) ? Number(preset.created_at) : now,
+            updated_at: _.isFinite(Number(preset && preset.updated_at)) ? Number(preset.updated_at) : now
+        };
+    };
+
+    var loadGwTechPresetsFromStorage = function() {
+        try {
+            var raw = localStorage.getItem(GW_TECH_PRESETS_STORAGE_KEY);
+            if (!raw) {
+                return [];
+            }
+
+            var parsed = JSON.parse(raw);
+            var presets = _.isArray(parsed) ? parsed : parsed && parsed.presets;
+            return _.sortBy(_.map(_.filter(presets || [], _.isObject), normalizeGwTechPreset), function(preset) {
+                return normalizeGwTechSearchText(preset.name);
+            });
+        }
+        catch (e) {
+            console.log('[GW TECH] Failed loading tech presets: ' + e);
+            return [];
+        }
+    };
+
+    var saveGwTechPresetsToStorage = function(presets) {
+        try {
+            localStorage.setItem(GW_TECH_PRESETS_STORAGE_KEY, JSON.stringify({
+                version: 1,
+                presets: presets || []
+            }));
+        }
+        catch (e) {
+            console.log('[GW TECH] Failed saving tech presets: ' + e);
+        }
+    };
+
+    function GwTechPresetOptionViewModel(preset) {
+        var self = this;
+
+        self.raw = normalizeGwTechPreset(preset);
+        self.id = self.raw.id;
+        self.name = self.raw.name;
+        self.loadout = self.raw.loadout;
+        self.cards = self.raw.cards.slice(0);
+        self.loadoutOption = ko.computed(function() {
+            return model && model.findGwTechLoadoutOptionById(self.loadout);
+        });
+        self.loadoutSummaryText = ko.computed(function() {
+            var option = self.loadoutOption();
+            return option ? option.summaryText() : self.loadout;
+        });
+        self.cardPreviews = ko.computed(function() {
+            return _.map(self.cards, function(cardId) {
+                var option = model && model.findGwTechCardOptionById(cardId);
+                var icon = option && option.card && unwrapGwTechValue(option.card.icon);
+
+                return {
+                    id: cardId,
+                    icon: icon,
+                    summaryText: option ? option.summaryText() : cardId
+                };
+            });
+        });
+        self.cardCountText = ko.computed(function() {
+            return self.cards.length + (self.cards.length === 1 ? ' card' : ' cards');
+        });
+        self.searchText = ko.computed(function() {
+            var option = self.loadoutOption();
+            var parts = [self.name, self.id, self.loadout, self.loadoutSummaryText()];
+
+            if (option) {
+                parts.push(option.descText());
+            }
+
+            _.forEach(self.cards, function(cardId) {
+                var cardOption = model && model.findGwTechCardOptionById(cardId);
+                parts.push(cardId);
+                if (cardOption) {
+                    parts.push(cardOption.summaryText());
+                    parts.push(cardOption.descText());
+                }
+            });
+
+            return normalizeGwTechSearchText(parts.join(' '));
+        });
+        self.matchesSearch = function(search) {
+            var needle = normalizeGwTechSearchText(search || '');
+            if (!needle) {
+                return true;
+            }
+
+            return self.searchText().indexOf(needle) >= 0;
+        };
+    }
+
+    var normalizeGwTechCards = function(cards, slotCount) {
+        var result = [];
+
+        _.forEach(cards || [], function(card) {
+            if (isGwTechCardId(card)) {
+                result.push(card);
+            }
+        });
+
+        if (_.isFinite(slotCount) && result.length > slotCount) {
+            result.length = slotCount;
+        }
+
+        return result;
+    };
+
+    var normalizeModIdentifier = function(identifier) {
+        if (!_.isString(identifier)) {
+            return '';
+        }
+
+        var trimmed = identifier.trim();
+        if (!trimmed.length) {
+            return '';
+        }
+
+        return trimmed.toLowerCase();
+    };
+
+    var getRequiredGwScenesForMod = function(mod) {
+        var scenes = mod && mod.scenes;
+        if (!scenes || !_.isObject(scenes)) {
+            return [];
+        }
+
+        return _.filter(REQUIRED_GW_SCENE_KEYS, function(sceneKey) {
+            if (!_.has(scenes, sceneKey)) {
+                return false;
+            }
+
+            var sceneValue = scenes[sceneKey];
+            if (_.isArray(sceneValue)) {
+                return sceneValue.length > 0;
+            }
+
+            return !!sceneValue;
+        });
+    };
+
+    var hasRequiredGwDescription = function(mod) {
+        var description = mod && mod.description;
+        return _.isString(description) && description.toLowerCase().indexOf(REQUIRED_GW_DESCRIPTION_PHRASE) !== -1;
+    };
+
+    var isRequiredGwClientMod = function(mod) {
+        return getRequiredGwScenesForMod(mod).length > 0 && hasRequiredGwDescription(mod);
+    };
+
+    var buildClientModManifest = function(mountedMods) {
+        var activeIdentifiers = [];
+        var activeRequiredIdentifiers = [];
+        var activeRequiredNamesById = {};
+        var seen = {};
+        var seenRequired = {};
+
+        _.forEach(mountedMods || [], function(mod) {
+            var identifier = normalizeModIdentifier(mod && mod.identifier);
+            if (!identifier) {
+                return;
+            }
+
+            if (!seen[identifier]) {
+                seen[identifier] = true;
+                activeIdentifiers.push(identifier);
+            }
+
+            if (!isRequiredGwClientMod(mod) || seenRequired[identifier]) {
+                return;
+            }
+
+            seenRequired[identifier] = true;
+            activeRequiredIdentifiers.push(identifier);
+            activeRequiredNamesById[identifier] = (_.isString(mod.display_name) && mod.display_name.length)
+                ? mod.display_name
+                : identifier;
+        });
+
+        return {
+            active_identifiers: activeIdentifiers,
+            active_required_identifiers: activeRequiredIdentifiers,
+            active_required_names_by_id: activeRequiredNamesById
+        };
+    };
+
+    var isGwoMounted = function(mountedMods) {
+        return _.some(mountedMods || [], function(mod) {
+            return normalizeModIdentifier(mod && mod.identifier) === GWO_MOD_IDENTIFIER;
+        });
+    };
+
+    var ensureGwoTechInventoryCompatibility = function(inventory) {
+        if (!inventory) {
+            return inventory;
+        }
+
+        if (!_.isFunction(inventory.aiMods)) {
+            inventory.aiMods = ko.observableArray([]);
+        }
+
+        if (!_.isFunction(inventory.addAIMods)) {
+            inventory.addAIMods = function(aiMods) {
+                inventory.aiMods(inventory.aiMods().concat(aiMods || []));
+            };
+        }
+
+        return inventory;
+    };
+
+    var setupGwoTechGlobals = function() {
+        model.gwoCardsGrantingAdvancedTech = GWO_CARDS_GRANTING_ADVANCED_TECH.slice(0);
+    };
+
+    var buildRequiredLookupWithDependencies = function(requiredIdentifiers, installedClientModsById) {
+        var lookup = {};
+
+        var includeIdentifier = function(identifier) {
+            var normalizedIdentifier = normalizeModIdentifier(identifier);
+            if (!normalizedIdentifier || lookup[normalizedIdentifier]) {
+                return;
+            }
+
+            lookup[normalizedIdentifier] = true;
+
+            var installed = installedClientModsById[normalizedIdentifier];
+            if (!installed || !_.isArray(installed.dependencies)) {
+                return;
+            }
+
+            _.forEach(installed.dependencies, function(dependencyIdentifier) {
+                includeIdentifier(dependencyIdentifier);
+            });
+        };
+
+        _.forEach(requiredIdentifiers || [], function(identifier) {
+            includeIdentifier(identifier);
+        });
+
+        return lookup;
+    };
+
+    var runWithRequiredClientModsOnly = function(requiredIdentifiers, work) {
+        var communityModsManager = window.CommunityModsManager;
+        var canRestrictClientMods = communityModsManager
+            && _.isFunction(communityModsManager.installedMods)
+            && communityModsManager.installedMods
+            && _.isFunction(communityModsManager.installedMods.valueHasMutated)
+            && _.isFunction(communityModsManager.remountClientMods);
+
+        if (!canRestrictClientMods) {
+            return $.when(work());
+        }
+
+        var done = $.Deferred();
+        var installedMods = communityModsManager.installedMods();
+
+        if (!_.isArray(installedMods)) {
+            return $.when(work());
+        }
+
+        var clientEnabledBefore = {};
+        var installedClientModsById = {};
+
+        _.forEach(installedMods, function(mod) {
+            if (!mod || mod.context !== 'client') {
+                return;
+            }
+
+            var identifier = normalizeModIdentifier(mod.identifier);
+            if (!identifier) {
+                return;
+            }
+
+            clientEnabledBefore[identifier] = !!mod.enabled;
+            installedClientModsById[identifier] = mod;
+        });
+
+        var requiredLookup = buildRequiredLookupWithDependencies(requiredIdentifiers, installedClientModsById);
+
+        _.forEach(installedMods, function(mod) {
+            if (!mod || mod.context !== 'client') {
+                return;
+            }
+
+            var identifier = normalizeModIdentifier(mod.identifier);
+            if (!identifier) {
+                return;
+            }
+
+            mod.enabled = !!requiredLookup[identifier];
+        });
+
+        communityModsManager.installedMods.valueHasMutated();
+
+        communityModsManager.remountClientMods().always(function() {
+            $.when(work()).then(function() {
+                var workArgs = arguments;
+                _.forEach(installedMods, function(mod) {
+                    if (!mod || mod.context !== 'client') {
+                        return;
+                    }
+
+                    var identifier = normalizeModIdentifier(mod.identifier);
+                    if (!identifier || !_.has(clientEnabledBefore, identifier)) {
+                        return;
+                    }
+
+                    mod.enabled = clientEnabledBefore[identifier];
+                });
+
+                communityModsManager.installedMods.valueHasMutated();
+                communityModsManager.remountClientMods().always(function() {
+                    done.resolve.apply(done, workArgs);
+                });
+            }, function() {
+                var workArgs = arguments;
+                _.forEach(installedMods, function(mod) {
+                    if (!mod || mod.context !== 'client') {
+                        return;
+                    }
+
+                    var identifier = normalizeModIdentifier(mod.identifier);
+                    if (!identifier || !_.has(clientEnabledBefore, identifier)) {
+                        return;
+                    }
+
+                    mod.enabled = clientEnabledBefore[identifier];
+                });
+
+                communityModsManager.installedMods.valueHasMutated();
+                communityModsManager.remountClientMods().always(function() {
+                    done.reject.apply(done, workArgs);
+                });
+            });
+        });
+
+        return done.promise();
+    };
+
+    function GwTechSlotCardViewModel(slot, index, cardId) {
+        var self = this;
+
+        self.slot = slot;
+        self.index = index;
+        self.cardId = cardId;
+        self.card = new CardViewModel(cardId ? { id: cardId } : undefined);
+        self.filled = ko.observable(!!cardId);
+        self.isNextOpen = ko.computed(function() {
+            return index === slot.gwTechCards().length;
+        });
+        self.isRightmostFilled = ko.computed(function() {
+            return index === slot.gwTechCards().length - 1;
+        });
+        self.canPick = ko.computed(function() {
+            return slot.canEditGwTech() && (self.isNextOpen() || self.isRightmostFilled());
+        });
+        self.canClear = ko.computed(function() {
+            return slot.canEditGwTech() && self.filled() && self.isRightmostFilled();
+        });
+        self.inspect = function(data, event) {
+            slot.showGwTechCardInspector(self.card, event);
+        };
+        self.moveInspector = function(data, event) {
+            slot.moveGwTechInspector(event);
+        };
+        self.hideInspector = function() {
+            slot.hideGwTechInspector();
+        };
+        self.pick = function(data, event) {
+            slot.openGwTechCardPicker(index, event);
+        };
+        self.clear = function(data, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            slot.clearGwTechCard(index);
+        };
+    }
+
+    function SlotViewModel(options /* ai economy_factor */)
+    {
+        var self = this;
+        var states = ['empty', 'player'];
+
+        self.index = ko.observable(options.index);
+        self.armyIndex = ko.observable(options.armyIndex);
+
+        self.player = ko.observable(null);
+        self.stateIndex = ko.observable(options.ai ? 2 : 0);
+        self.isEmpty = ko.computed(function () { return self.stateIndex() === 0 });
+        self.isPlayer = ko.computed(function () { return self.stateIndex() === 1 });
+        self.ai = ko.observable(false);
+
+        self.hover = ko.observable(false);
+
+        self.playerName = ko.observable();
+        self.playerId = ko.observable();
+        self.isCreator = ko.observable(false);
+        self.creatorName = ko.observable();
+        self.isReady = ko.observable(false);
+        self.isLoading = ko.observable(false);
+        self.isWaiting = ko.computed(function(){
+            return self.isLoading() && !model.systemIsEmpty()
+        })
+        self.primaryColor = ko.observable('');
+        self.rawColor = ko.observable([]);
+
+        self.secondaryColor = ko.observable('');
+        self.commander = ko.observable();
+        self.gwTechLoadout = ko.observable(DEFAULT_GW_TECH_LOADOUT);
+        self.gwTechCards = ko.observableArray([]);
+        self.showGwTechLoadoutPicker = ko.observable(false);
+        self.showGwTechCardPicker = ko.observable(false);
+        self.showGwTechPresetPicker = ko.observable(false);
+        self.gwTechPickerSlotIndex = ko.observable(-1);
+        self.gwTechLoadoutSearch = ko.observable('');
+        self.gwTechCardSearch = ko.observable('');
+        self.gwTechPresetSearch = ko.observable('');
+        self.gwTechPresetError = ko.observable('');
+        self.gwTechPresetApplying = ko.observable(false);
+        self.gwTechSelectedLoadoutOption = ko.observable();
+        self.gwTechSelectedCardOption = ko.observable();
+        self.gwTechSelectedPresetOption = ko.observable();
+        self.gwTechPresetNamePromptVisible = ko.observable(false);
+        self.gwTechPresetNamePromptMode = ko.observable('');
+        self.gwTechPresetNamePromptValue = ko.observable('');
+        self.gwTechPresetNamePromptError = ko.observable('');
+        self.gwTechPresetNamePromptReplaceTarget = ko.observable();
+        self.gwTechPresetNamePromptPreset = ko.observable();
+        self.gwTechPresetPendingDeleteId = ko.observable('');
+        self.gwTechAllowedCardIds = ko.observable({});
+        self.gwTechValidationPending = ko.observable(false);
+        self.showGwTech = ko.computed(function() {
+            return self.isPlayer() && !!model && model.gwTechCardSlotCount() > 0;
+        });
+        self.gwTechUsesVanillaLoadout = ko.computed(function() {
+            return isVanillaGwTechLoadout(self.gwTechLoadout());
+        });
+        self.armyUsesSharedGwTech = ko.computed(function() {
+            var army = model && model.armies()[self.armyIndex()];
+            return !!army && army.sharedArmy();
+        });
+        self.isSharedGwTechSlot = ko.computed(function() {
+            var army = model && model.armies()[self.armyIndex()];
+            return !!army && army.gwTechSharedSlot && army.gwTechSharedSlot() === self;
+        });
+        self.gwTechLoadoutCard = ko.computed(function() {
+            if (!self.showGwTech()) {
+                return null;
+            }
+
+            if (self.gwTechUsesVanillaLoadout()) {
+                return makeVanillaGwTechLoadoutCard();
+            }
+
+            return new CardViewModel({ id: self.gwTechLoadout() });
+        });
+        var gwTechSlotCardCache = [];
+        self.gwTechSlotCards = ko.computed(function() {
+            if (!self.showGwTech() || self.gwTechUsesVanillaLoadout()) {
+                gwTechSlotCardCache = [];
+                return [];
+            }
+
+            var slotCount = model ? model.gwTechCardSlotCount() : 0;
+            var cards = self.gwTechCards();
+            var result = [];
+
+            _.forEach(_.range(0, slotCount), function(index) {
+                var cardId = cards[index];
+                var cached = gwTechSlotCardCache[index];
+                if (!cached || cached.cardId !== cardId) {
+                    cached = new GwTechSlotCardViewModel(self, index, cardId);
+                }
+                result.push(cached);
+            });
+
+            gwTechSlotCardCache = result;
+            return result;
+        });
+        self.canEditGwTech = ko.computed(function() {
+            if (!self.showGwTech()) {
+                return false;
+            }
+            if (self.armyUsesSharedGwTech()) {
+                return self.isSharedGwTechSlot() && model.isGameCreator();
+            }
+
+            var slotPlayerId = self.playerId();
+            var ownsSlot = (!!slotPlayerId && String(slotPlayerId) === String(model.uberId && model.uberId()))
+                || (!!slotPlayerId && String(slotPlayerId) === String(model.displayName && model.displayName()))
+                || self.playerName() === model.displayName();
+            return ownsSlot || (self.ai() && model.isGameCreator());
+        });
+        self.gwTechPickerOptions = ko.computed(function() {
+            if (!self.showGwTech()) {
+                return [];
+            }
+
+            var allowed = self.gwTechAllowedCardIds();
+            return _.map(model.gwTechCardOptions(), function(option) {
+                return new GwTechPickerOptionViewModel(option, !!allowed[option.id]);
+            });
+        });
+        self.gwTechVisibleLoadoutOptions = ko.computed(function() {
+            var search = self.gwTechLoadoutSearch();
+            return _.filter(model.gwTechLoadoutOptions(), function(option) {
+                return option && option.matchesSearch(search);
+            });
+        });
+        self.gwTechVisibleCardPickerOptions = ko.computed(function() {
+            var search = self.gwTechCardSearch();
+            return _.filter(self.gwTechPickerOptions(), function(option) {
+                return option && option.matchesSearch(search);
+            });
+        });
+        self.gwTechLoadoutDetailOption = ko.computed(function() {
+            var selected = self.gwTechSelectedLoadoutOption();
+            if (selected && selected.matchesSearch(self.gwTechLoadoutSearch())) {
+                return selected;
+            }
+
+            return self.gwTechVisibleLoadoutOptions()[0];
+        });
+        self.gwTechCardDetailOption = ko.computed(function() {
+            var selected = self.gwTechSelectedCardOption();
+            if (selected && selected.matchesSearch(self.gwTechCardSearch())) {
+                return selected;
+            }
+
+            return self.gwTechVisibleCardPickerOptions()[0];
+        });
+        self.gwTechPresetOptions = ko.computed(function() {
+            return _.map(model && model.gwTechPresets ? model.gwTechPresets() : [], function(preset) {
+                return new GwTechPresetOptionViewModel(preset);
+            });
+        });
+        self.gwTechVisiblePresetOptions = ko.computed(function() {
+            var search = self.gwTechPresetSearch();
+            return _.filter(self.gwTechPresetOptions(), function(option) {
+                return option && option.matchesSearch(search);
+            });
+        });
+        self.gwTechPresetDetailOption = ko.computed(function() {
+            var selected = self.gwTechSelectedPresetOption();
+            if (selected && selected.matchesSearch(self.gwTechPresetSearch())) {
+                return selected;
+            }
+
+            return self.gwTechVisiblePresetOptions()[0];
+        });
+        self.gwTechPresetNamePromptTitle = ko.computed(function() {
+            return self.gwTechPresetNamePromptMode() === 'rename' ? loc('!LOC:Rename Preset') : loc('!LOC:Save Preset');
+        });
+        self.gwTechPresetNamePromptActionText = ko.computed(function() {
+            return self.gwTechPresetNamePromptMode() === 'rename' ? loc('!LOC:Rename') : loc('!LOC:Save');
+        });
+        self.setGwTechLoadoutDetailOption = function(option) {
+            self.gwTechSelectedLoadoutOption(option);
+        };
+        self.setGwTechCardDetailOption = function(option) {
+            self.gwTechSelectedCardOption(option);
+        };
+        self.setGwTechPresetDetailOption = function(option) {
+            self.gwTechSelectedPresetOption(option);
+            self.gwTechPresetError('');
+            self.gwTechPresetPendingDeleteId('');
+        };
+        self.focusGwTechPickerSearch = function(pickerSelector) {
+            window.setTimeout(function() {
+                var search = $(pickerSelector + ':visible .gw-tech-picker-search').first();
+                if (!search.length) {
+                    console.log('[GW TECH] Could not focus tech picker search for ' + pickerSelector + '.');
+                    return;
+                }
+
+                search.focus();
+                search.select();
+            }, 0);
+        };
+        self.focusGwTechPresetNameInput = function() {
+            window.setTimeout(function() {
+                var input = $('.gw-tech-preset-picker:visible .gw-tech-preset-name-input').first();
+                if (!input.length) {
+                    console.log('[GW TECH] Could not focus preset name input.');
+                    return;
+                }
+
+                input.focus();
+                input.select();
+            }, 0);
+        };
+        self.gwTechPresetNamePromptValue.subscribe(function() {
+            self.gwTechPresetNamePromptError('');
+            self.gwTechPresetNamePromptReplaceTarget(undefined);
+        });
+        self.showGwTechLoadoutInspector = function(data, event) {
+            model.showGwTechInspector(self.gwTechLoadoutCard(), event);
+        };
+        self.showGwTechCardInspector = function(card, event) {
+            model.showGwTechInspector(card, event);
+        };
+        self.moveGwTechInspector = function(event) {
+            model.moveGwTechInspector(event);
+        };
+        self.hideGwTechInspector = function() {
+            model.hideGwTechInspector();
+        };
+        self.closeGwTechPickers = function() {
+            self.showGwTechLoadoutPicker(false);
+            self.showGwTechCardPicker(false);
+            self.showGwTechPresetPicker(false);
+            self.gwTechPickerSlotIndex(-1);
+            self.gwTechLoadoutSearch('');
+            self.gwTechCardSearch('');
+            self.gwTechPresetSearch('');
+            self.gwTechPresetError('');
+            self.gwTechPresetNamePromptVisible(false);
+            self.gwTechPresetNamePromptMode('');
+            self.gwTechPresetNamePromptValue('');
+            self.gwTechPresetNamePromptError('');
+            self.gwTechPresetNamePromptReplaceTarget(undefined);
+            self.gwTechPresetNamePromptPreset(undefined);
+            self.gwTechPresetPendingDeleteId('');
+            self.gwTechSelectedLoadoutOption(undefined);
+            self.gwTechSelectedCardOption(undefined);
+            self.gwTechSelectedPresetOption(undefined);
+        };
+        self.openGwTechLoadoutPicker = function(data, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech()) {
+                return;
+            }
+
+            model.closeDropDowns();
+            self.gwTechLoadoutSearch('');
+            self.gwTechSelectedLoadoutOption(_.find(model.gwTechLoadoutOptions(), function(option) {
+                return option && option.id === self.gwTechLoadout();
+            }) || model.gwTechLoadoutOptions()[0]);
+            self.showGwTechLoadoutPicker(true);
+            self.focusGwTechPickerSearch('.gw-tech-loadout-picker');
+        };
+        self.openGwTechPresetPicker = function(data, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.showGwTech()) {
+                return;
+            }
+
+            model.closeDropDowns();
+            self.gwTechPresetSearch('');
+            self.gwTechPresetError('');
+            self.gwTechPresetNamePromptVisible(false);
+            self.gwTechPresetNamePromptMode('');
+            self.gwTechPresetNamePromptValue('');
+            self.gwTechPresetNamePromptError('');
+            self.gwTechPresetNamePromptReplaceTarget(undefined);
+            self.gwTechPresetNamePromptPreset(undefined);
+            self.gwTechPresetPendingDeleteId('');
+            self.gwTechSelectedPresetOption(self.gwTechPresetOptions()[0]);
+            self.showGwTechPresetPicker(true);
+            self.focusGwTechPickerSearch('.gw-tech-preset-picker');
+        };
+        self.selectGwTechLoadout = function(option, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech() || !option || !option.id) {
+                return;
+            }
+
+            self.gwTechLoadout(option.id);
+            self.gwTechCards([]);
+            model.send_message('set_gw_tech_loadout', {
+                id: self.playerId(),
+                loadout_card_id: option.id
+            });
+            self.closeGwTechPickers();
+        };
+        self.openGwTechCardPicker = function(index, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech() || self.gwTechUsesVanillaLoadout()) {
+                return;
+            }
+
+            var firstEmpty = self.gwTechCards().length;
+            var rightmostFilled = self.gwTechCards().length - 1;
+            if (index !== firstEmpty && index !== rightmostFilled) {
+                return;
+            }
+
+            model.closeDropDowns();
+            self.gwTechPickerSlotIndex(index);
+            self.gwTechAllowedCardIds({});
+            self.gwTechCardSearch('');
+            self.gwTechSelectedCardOption(undefined);
+            self.gwTechValidationPending(true);
+            model.buildGwTechAllowedCardMap(self, index).then(function(allowed) {
+                if (self.gwTechPickerSlotIndex() !== index) {
+                    return;
+                }
+                self.gwTechAllowedCardIds(allowed);
+                self.gwTechValidationPending(false);
+                self.gwTechSelectedCardOption(_.find(self.gwTechPickerOptions(), function(option) {
+                    return option && option.enabled;
+                }) || self.gwTechPickerOptions()[0]);
+                self.showGwTechCardPicker(true);
+                self.focusGwTechPickerSearch('.gw-tech-card-picker');
+            }, function(reason) {
+                console.error('Failed to validate GW tech cards: ' + reason);
+                self.gwTechAllowedCardIds({});
+                self.gwTechValidationPending(false);
+                self.gwTechSelectedCardOption(self.gwTechPickerOptions()[0]);
+                self.showGwTechCardPicker(true);
+                self.focusGwTechPickerSearch('.gw-tech-card-picker');
+            });
+        };
+        self.selectGwTechCard = function(option, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech() || self.gwTechUsesVanillaLoadout() || !option || !option.enabled) {
+                return;
+            }
+
+            var index = self.gwTechPickerSlotIndex();
+            var cards = self.gwTechCards().slice(0);
+            cards[index] = option.id;
+            self.gwTechCards(normalizeGwTechCards(cards, model.gwTechCardSlotCount()));
+            model.send_message('set_gw_tech_card', {
+                id: self.playerId(),
+                slot_index: index,
+                card_id: option.id
+            });
+            self.closeGwTechPickers();
+        };
+        self.clearGwTechCard = function(index) {
+            if (!self.canEditGwTech() || index !== self.gwTechCards().length - 1) {
+                return;
+            }
+
+            var cards = self.gwTechCards().slice(0);
+            cards.splice(index, 1);
+            self.gwTechCards(cards);
+            model.send_message('clear_gw_tech_card', {
+                id: self.playerId(),
+                slot_index: index
+            });
+            self.closeGwTechPickers();
+        };
+        self.pruneInvalidGwTechCards = function() {
+            model.findFirstInvalidGwTechCardIndex(self).then(function(invalidIndex) {
+                if (invalidIndex < 0) {
+                    return;
+                }
+
+                var originalLength = self.gwTechCards().length;
+                var cards = self.gwTechCards().slice(0, invalidIndex);
+                self.gwTechCards(cards);
+
+                for (var index = originalLength - 1; index >= invalidIndex; --index) {
+                    model.send_message('clear_gw_tech_card', {
+                        id: self.playerId(),
+                        slot_index: index
+                    });
+                }
+            });
+        };
+
+        self.defaultGwTechPresetName = function() {
+            var option = model.findGwTechLoadoutOptionById(self.gwTechLoadout());
+            var loadoutName = option ? option.summaryText() : self.gwTechLoadout();
+            var cardCount = self.gwTechUsesVanillaLoadout() ? 0 : self.gwTechCards().length;
+            return loadoutName + ' (' + cardCount + (cardCount === 1 ? ' card' : ' cards') + ')';
+        };
+        self.captureGwTechPreset = function(name) {
+            var loadout = normalizeGwTechLoadout(self.gwTechLoadout());
+            return normalizeGwTechPreset({
+                name: name || self.defaultGwTechPresetName(),
+                loadout: loadout,
+                cards: isVanillaGwTechLoadout(loadout) ? [] : normalizeGwTechCards(self.gwTechCards(), model.gwTechCardSlotCount())
+            });
+        };
+        self.openGwTechPresetNamePrompt = function(mode, defaultName, preset) {
+            self.gwTechPresetError('');
+            self.gwTechPresetNamePromptMode(mode);
+            self.gwTechPresetNamePromptValue(defaultName || '');
+            self.gwTechPresetNamePromptError('');
+            self.gwTechPresetNamePromptReplaceTarget(undefined);
+            self.gwTechPresetNamePromptPreset(preset);
+            self.gwTechPresetPendingDeleteId('');
+            self.gwTechPresetNamePromptVisible(true);
+            self.focusGwTechPresetNameInput();
+        };
+        self.cancelGwTechPresetNamePrompt = function(data, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            self.gwTechPresetNamePromptVisible(false);
+            self.gwTechPresetNamePromptMode('');
+            self.gwTechPresetNamePromptValue('');
+            self.gwTechPresetNamePromptError('');
+            self.gwTechPresetNamePromptReplaceTarget(undefined);
+            self.gwTechPresetNamePromptPreset(undefined);
+        };
+        self.handleGwTechPresetNamePromptKey = function(data, event) {
+            if (!event) {
+                return true;
+            }
+
+            if (event.keyCode === 13) {
+                self.commitGwTechPresetNamePrompt(false, event);
+                return false;
+            }
+            if (event.keyCode === 27) {
+                self.cancelGwTechPresetNamePrompt(data, event);
+                return false;
+            }
+
+            return true;
+        };
+        self.commitGwTechPresetNamePrompt = function(replaceExisting, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech()) {
+                return;
+            }
+
+            var mode = self.gwTechPresetNamePromptMode();
+            var name = normalizeGwTechPresetName(self.gwTechPresetNamePromptValue());
+            var existing;
+            var preset;
+            var saved;
+            var selected;
+
+            if (!name) {
+                self.gwTechPresetNamePromptError(loc('!LOC:Enter a preset name.'));
+                return;
+            }
+
+            existing = model.findGwTechPresetByName(name);
+
+            if (mode === 'save') {
+                if (existing && !replaceExisting) {
+                    self.gwTechPresetNamePromptReplaceTarget(existing);
+                    self.gwTechPresetNamePromptError(loc('!LOC:Preset already exists.'));
+                    return;
+                }
+
+                preset = self.captureGwTechPreset(name);
+                if (existing) {
+                    preset.id = existing.id;
+                    preset.created_at = existing.created_at;
+                }
+
+                saved = model.saveGwTechPreset(preset);
+                self.gwTechPresetError('');
+                self.gwTechSelectedPresetOption(_.find(self.gwTechPresetOptions(), { id: saved.id }));
+                self.cancelGwTechPresetNamePrompt(null, event);
+                return;
+            }
+
+            if (mode === 'rename') {
+                selected = self.gwTechPresetNamePromptPreset();
+                if (!selected) {
+                    self.gwTechPresetNamePromptError(loc('!LOC:No preset selected.'));
+                    return;
+                }
+                if (name === selected.name) {
+                    self.cancelGwTechPresetNamePrompt(null, event);
+                    return;
+                }
+                if (existing && existing.id !== selected.id && !replaceExisting) {
+                    self.gwTechPresetNamePromptReplaceTarget(existing);
+                    self.gwTechPresetNamePromptError(loc('!LOC:Preset already exists.'));
+                    return;
+                }
+
+                saved = model.renameGwTechPreset(selected.raw, name, existing);
+                self.gwTechPresetError('');
+                self.gwTechSelectedPresetOption(_.find(self.gwTechPresetOptions(), { id: saved.id }));
+                self.cancelGwTechPresetNamePrompt(null, event);
+                return;
+            }
+
+            self.gwTechPresetNamePromptError(loc('!LOC:No preset action selected.'));
+        };
+        self.saveCurrentGwTechPreset = function(data, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech()) {
+                return;
+            }
+
+            self.openGwTechPresetNamePrompt('save', self.defaultGwTechPresetName());
+        };
+        self.renameGwTechPreset = function(data, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech()) {
+                return;
+            }
+
+            var selected = self.gwTechPresetDetailOption();
+            if (!selected) {
+                self.gwTechPresetError(loc('!LOC:No preset selected.'));
+                return;
+            }
+
+            self.openGwTechPresetNamePrompt('rename', selected.name, selected);
+        };
+        self.deleteGwTechPreset = function(data, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech()) {
+                return;
+            }
+
+            var selected = self.gwTechPresetDetailOption();
+            if (!selected) {
+                self.gwTechPresetError(loc('!LOC:No preset selected.'));
+                return;
+            }
+
+            self.cancelGwTechPresetNamePrompt(null, event);
+
+            if (self.gwTechPresetPendingDeleteId() !== selected.id) {
+                self.gwTechPresetPendingDeleteId(selected.id);
+                self.gwTechPresetError(loc('!LOC:Click Delete again to confirm.'));
+                return;
+            }
+
+            model.deleteGwTechPreset(selected.id);
+            self.gwTechPresetError('');
+            self.gwTechPresetPendingDeleteId('');
+            self.gwTechSelectedPresetOption(self.gwTechVisiblePresetOptions()[0]);
+        };
+        self.applyGwTechPreset = function(data, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!self.canEditGwTech() || self.gwTechPresetApplying()) {
+                return;
+            }
+
+            var selected = self.gwTechPresetDetailOption();
+            if (!selected) {
+                self.gwTechPresetError(loc('!LOC:No preset selected.'));
+                return;
+            }
+
+            self.gwTechPresetApplying(true);
+            self.gwTechPresetError('');
+            model.validateGwTechPresetForSlot(self, selected.raw).then(function(preset) {
+                self.gwTechLoadout(preset.loadout);
+                self.gwTechCards(preset.cards.slice(0));
+
+                model.send_message('set_gw_tech_loadout', {
+                    id: self.playerId(),
+                    loadout_card_id: preset.loadout
+                });
+
+                _.forEach(preset.cards, function(cardId, index) {
+                    model.send_message('set_gw_tech_card', {
+                        id: self.playerId(),
+                        slot_index: index,
+                        card_id: cardId
+                    });
+                });
+
+                self.gwTechPresetApplying(false);
+                self.closeGwTechPickers();
+            }, function(reason) {
+                self.gwTechPresetApplying(false);
+                self.gwTechPresetError(reason || loc('!LOC:Preset is not valid for this slot.'));
+            });
+        };
+
+        self.serverEconFactor = ko.observable(parseFloat(options.economy_factor));
+        self.clientEconFactor = ko.observable(null);
+        self.economyFactor = ko.computed({
+            read: function() {
+                var server = self.serverEconFactor();
+                var client = self.clientEconFactor();
+                if (_.isFinite(client))
+                    return client.toFixed(1);
+                if (_.isFinite(server))
+                    return server.toFixed(1);
+                return '1.0';
+            },
+            write: function(value) {
+                if (!model.isGameCreator())
+                    return;
+
+                var newValue = parseFloat(value);
+                if (!_.isFinite(newValue))
+                    newValue = 1.0;
+
+                newValue = Math.min(Math.max(0.0, newValue), 10.0);
+
+                if (newValue !== self.clientEconFactor()) {
+                    model.send_message('set_econ_factor', {
+                        id: self.playerId(),
+                        economy_factor: newValue.toFixed(1)
+                    });
+                }
+                self.clientEconFactor(newValue);
+                self.economyFactor.notifySubscribers();
+            }
+        });
+
+        self.adjustEconFactor = function (value) {
+            var newValue = (parseFloat(self.economyFactor()) + value).toFixed(1)
+            self.economyFactor(newValue);
+        };
+
+        self.increaseEconFactor = function (value) {
+            self.adjustEconFactor(0.1);
+        };
+
+        self.decreaseEconFactor = function (value) {
+            self.adjustEconFactor(-0.1);
+        };
+
+        self.lockColorIndex = ko.observable(false);
+        self.colorIndex = ko.observable();
+        self.secondaryColorIndex = ko.observable(-1);
+
+        self.colorIndex.subscribe(function (value) {
+            if (self.lockColorIndex())
+                return;
+
+            self.secondaryColorIndex(-1);
+
+            if (self.ai())
+                model.send_message('set_primary_color_index_for_ai', {
+                    id: self.playerId(),
+                    color: Number(self.colorIndex())
+                });
+            else
+                model.send_message('set_primary_color_index', Number(self.colorIndex()));
+
+            model.showColorPicker(false);
+            model.colorPickerSlot(null);
+        });
+
+        self.secondaryColorIndex.subscribe(function (value) {
+            if (self.lockColorIndex())
+                return;
+
+            if (value === -1)
+                return;
+
+            if (self.ai())
+                model.send_message('set_secondary_color_index_for_ai', {
+                    id: self.playerId(),
+                    color: Number(value)
+                });
+            else
+                model.send_message('set_secondary_color_index', Number(value));
+
+            model.showColorPicker(false);
+            model.colorPickerSlot(null);
+        });
+
+        self.lockAIPersonality = ko.observable(false);
+        self.aiPersonality = ko.observable(model.aiPersonalityNames()[0]);
+        self.aiPersonality.subscribe(function (value) {
+            if (!value || !self.ai() || self.lockAIPersonality() || !model.isGameCreator())
+                return;
+
+            var personalities = model.aiPersonalities();
+
+            var personality = personalities[value];
+
+            if (!personality)
+                return;
+
+            personality.name = value;
+            model.previousAIPersonality(value);
+
+            model.send_message('set_ai_personality', {
+                id: self.playerId(),
+                ai_personality: personality
+            });
+        });
+
+        self.lockAILandingPolicy = ko.observable(false);
+        self.aiLandingPolicy = ko.observable(model.aiLandingPolicyOptions()[0]);
+        self.aiLandingPolicy.subscribe(function (value) {
+            if (self.lockAILandingPolicy() || !model.isGameCreator())
+                return;
+
+            if (!self.ai() || !value)
+                return;
+
+            model.previousAILandingPolicy(value);
+
+            model.send_message('set_ai_landing_policy', {
+                id: self.playerId(),
+                ai_landing_policy: value
+            });
+        });
+
+        self.updateFromJson = function (json) {
+            if (_.isEmpty(json)) {
+                self.stateIndex(0);
+                self.playerName('');
+            }
+            else if (_.has(json, 'name')) {
+                self.stateIndex(1);
+                self.playerName(json.name);
+            }
+
+            if (_.has(json, 'id'))
+                self.playerId(json.id);
+
+            self.isCreator(!!json.creator);
+
+            self.ai(!!json.ai);
+
+            if (json.personality) {
+                self.lockAIPersonality(true);
+                self.aiPersonality(json.personality.name);
+                self.lockAIPersonality(false);
+            }
+
+            if (json.landing_policy) {
+                self.lockAILandingPolicy(true);
+                self.aiLandingPolicy(json.landing_policy);
+                self.lockAILandingPolicy(false);
+            }
+
+            self.serverEconFactor(parseFloat(json.economy_factor));
+
+            if (json.color) {
+                self.rawColor(json.color);
+                if (json.color[0])
+                    self.primaryColor('rgb(' + json.color[0].join() + ')');
+                if (json.color[1])
+                    self.secondaryColor('rgb(' + json.color[1].join() + ')');
+            }
+
+            if (UberUtility.isDefinedAndValid(json.color_index)) {
+                self.lockColorIndex(true);
+                self.colorIndex(json.color_index);
+                self.lockColorIndex(false);
+            }
+
+            if (json.commander)
+                self.commander(json.commander);
+
+            self.gwTechLoadout(normalizeGwTechLoadout(json.gw_tech_loadout));
+            self.gwTechCards(self.gwTechUsesVanillaLoadout() ? [] : normalizeGwTechCards(json.gw_tech_cards, model.gwTechCardSlotCount()));
+
+            self.isReady(json.ready);
+            self.isLoading(json.loading);
+        };
+
+        self.clearPlayers = function ()
+        {
+            if (self.isPlayer())
+                self.stateIndex(0);
+
+            self.playerName('');
+            self.rawColor([]);
+            self.primaryColor('');
+            self.secondaryColor('');
+            self.clientEconFactor('');
+            self.gwTechLoadout(DEFAULT_GW_TECH_LOADOUT);
+            self.gwTechCards([]);
+            self.closeGwTechPickers();
+        };
+
+        self.containsThisPlayer = ko.computed(function () {
+            return self.playerName() === model.displayName();
+        });
+
+        self.allowColorModification = ko.computed(function () {
+            return self.containsThisPlayer() || (self.ai() && model.isGameCreator())
+        });
+
+        self.cinematicInfo = ko.computed(function() {
+            return {
+                ai: self.ai(),
+                commander: self.commander(),
+                name: self.playerName(),
+                color: self.rawColor()
+            };
+        });
+
+        self.draggableOptions = ko.computed(function()
+        {
+            return {
+                disabled: !model.isGameCreator(),
+                scope:'slots',
+                axis: 'y',
+                revert: true,
+                handle: '.slot-player',
+                cancel: '.slot-player-commander, .army-econ, .slot-controls, .gw-tech-strip',
+                // snap: '.one-slot',
+                containment: '.armies',
+                cursor: 'move',
+                start: function(event, ui)
+                {
+                    model.draggingPlayerId(self.playerId());
+                    model.draggingArmyIndex(self.armyIndex());
+                }
+            };
+        });
+
+        self.droppableOptions = ko.computed(function()
+        {
+            return {
+                scope: 'slots',
+                revert: true,
+                drop: function(event, ui)
+                {
+                    var from = model.draggingPlayerId();
+                    var to = self.playerId();
+
+                    var armyIndex = self.armyIndex();
+
+                    if (self.isEmpty())
+                    {
+                        if (model.draggingArmyIndex() != armyIndex)
+                            model.movePlayer(from, armyIndex);
+                    }
+                    else if (from !== to)
+                        model.swapPlayers(from, to);
+                }
+            }
+        });
+    }
+
+    function ArmyViewModel(army_index, options /* slots alliance ai economy_factor */) {
+        var self = this;
+
+        self.index = ko.observable(army_index);
+
+        self.aiArmy = ko.observable(!!options.ai);
+        self.aiArmy.subscribe(function (value) {
+            _.invoke(self.slots(), 'setIsAI', !!value);
+        });
+        self.toggleAiControl = function () {
+            //model.send_message('modify_army', {
+            //    army_index: self.index(),
+            //    options: { ai: !self.aiArmy() }
+            //});
+        };
+
+        self.slots = ko.observableArray([]);
+
+        var slot_count = options ? options.slots : 1;
+        for (var i = 0; i < slot_count; i++)
+            self.slots().push(new SlotViewModel({ index: i, armyIndex: self.index(), ai: self.aiArmy() }));
+
+        self.allianceGroup = ko.observable(0);
+        self.maxAllianceGroup = ko.observable(6);
+        self.allianceGroupImageSource = ko.computed(function () {
+            return 'coui://ui/main/shared/img/alliance_group/alliance_group_' + self.allianceGroup() + '.png';
+        });
+
+        self.numberOfSlots = ko.computed(function () { return self.slots().length; });
+        self.numberOfEmptySlots = ko.computed(function () {
+            return _.filter(self.slots(), function (element) { return element.isEmpty() }).length;
+        });
+        self.isEmpty = ko.computed(function () {
+            return self.numberOfEmptySlots() === self.slots().length;
+        });
+
+        self.alliance = ko.observable(!!options.alliance);
+        self.sharedArmy = ko.computed(function () { return model.isTeamGame() && !self.alliance(); });
+        self.gwTechSharedSlot = ko.computed(function() {
+            if (!self.sharedArmy() || !model || model.gwTechCardSlotCount() <= 0) {
+                return null;
+            }
+
+            return _.find(self.slots(), function(slot) {
+                return slot.isPlayer();
+            });
+        });
+        self.showGwTechShared = ko.computed(function() {
+            return !!self.gwTechSharedSlot();
+        });
+
+        self.showToggleSharedArmy = ko.computed(function () {
+            return model.isTeamGame() && self.numberOfSlots() > 1;
+        });
+        self.toggleSharedArmy = function () {
+            if (!model.isGameCreator())
+                return;
+
+            var alliance = !self.alliance();
+            self.alliance(alliance);
+            model.send_message('modify_army', {
+                army_index: self.index(),
+                options: { alliance: alliance }
+            });
+        };
+
+        self.metal = ko.observable(1000);
+        self.energy = ko.observable(1000);
+        self.rate = ko.observable(1.0);
+
+        self.changeAllianceGroup = function () {
+            self.allianceGroup((self.allianceGroup() + 1) % self.maxAllianceGroup());
+        }
+
+        self.showAddSlot = ko.computed(function () {
+            return model.canAddMorePlayers() && model.isGameCreator();
+        });
+        self.addSlot = function () {
+            if (!self.showAddSlot())
+                return;
+
+            var slots = self.numberOfSlots() + 1;
+            self.slots.push(new SlotViewModel({ index: self.slots().length, armyIndex: self.index(), ai: self.aiArmy() }));
+            model.send_message('modify_army', {
+                army_index: self.index(),
+                options: { slots: slots }
+            });
+        }
+        self.addSlotCSS = ko.computed(function() {
+            if (self.showAddSlot())
+                return 'btn_std_gray';
+            else
+                return 'btn_std_gray_disabled';
+        });
+
+        self.showRemoveSlot = function () {
+            return self.numberOfSlots() > 1;
+        }
+        self.removeSlot = function () {
+            model.send_message('modify_army', {
+                army_index: self.index(),
+                options: { slots: self.numberOfSlots() - 1 }
+            });
+        }
+
+        self.join = function ()
+        {
+            if (self.aiArmy() || model.thisPlayerIsReady() || self.index() == model.armyIndex())
+                return;
+
+            model.send_message('join_army',
+            {
+                army: self.index(),
+                commander: model.selectedCommander()
+            });
+        };
+
+        self.nextPrimaryColor = function () {
+            if (model.thisPlayerIsReady())
+                return;
+
+            model.send_message('next_primary_color');
+        };
+
+        self.nextSecondaryColor = function () {
+            if (model.thisPlayerIsReady())
+                return;
+
+            model.send_message('next_secondary_color');
+        };
+
+        self.dirtySlots = function() {
+            _.forEach(self.slots(), function(slot) {
+                slot.dirty = true;
+            });
+        };
+        self.cleanupSlots = function() {
+            _.forEach(self.slots(), function(slot)
+            {
+                if (slot.dirty) {
+                    slot.clearPlayers();
+                    delete slot.dirty;
+                }
+            });
+        };
+
+        self.clearPlayers = function () {
+            _.forEach(self.slots(), function (element) {
+                element.clearPlayers();
+            });
+        }
+
+        self.addPlayer = function (slot_index, options /* name, id, [color] */) {
+            var slot = self.slots()[slot_index];
+
+            if (slot) {
+                slot.updateFromJson(options);
+                delete slot.dirty;
+            }
+        }
+
+        self.updateFromJson = function(json)
+        {
+            self.aiArmy(!!json.ai);
+            self.alliance(!!json.alliance);
+
+            while (self.slots().length < json.slots)
+            {
+                self.slots.push(new SlotViewModel({ index: self.slots().length, armyIndex: self.index(), ai: self.aiArmy() }));
+            }
+
+            while (self.slots().length > json.slots)
+                self.slots.pop();
+        };
+
+        self.asJson = function() {
+            return {
+                slots: _.invoke(self.slots(), 'asJson'),
+                alliance : self.alliance(),
+                ai: self.aiArmy(),
+                economy_factor: self.econFactor
+            }
+        };
+
+        self.armyContainsThisPlayer = function () {
+            return !!(_.find(self.slots(), function (s) { return (s.playerName() == model.displayName()); }));
+        };
+
+        self.slotTag = ko.computed(function () { return (self.aiArmy()) ? loc("!LOC:AI Commander") : loc("!LOC:Player Slot") })
+        self.addSlotTag = ko.computed(function () { return (self.aiArmy()) ? loc("!LOC:Add AI Commander") : loc("!LOC:Add Slot") })
+
+        self.cinematicInfo = ko.computed(function() {
+            return {
+                players: _.invoke(self.slots(), 'cinematicInfo'),
+                shared: self.sharedArmy()
+            };
+        });
+    }
+
+    function ChatMessageViewModel(name, type  /* 'invalid' | 'lobby' | 'server' */, payload) {
+        var self = this;
+
+        self.username = ko.observable(name);
+        self.type = type; /* 'invalid' | 'lobby' | 'server' | 'settings' */
+        self.payload = ko.observable(payload);
+    }
+
+    function NewGameViewModel()
+    {
+        var self = this;
+
+        self.buildVersion = ko.observable().extend({session: 'build_version'});
+
+        self.reconnectToGameInfo = ko.observable().extend({ local: 'reconnect_to_game_info' });
+
+        self.returnFromLoad = ko.observable(!!$.url().param('returnFromLoad'));
+
+        self.userTriggeredDisconnect = ko.observable(false);
+
+       // Click handler for leave button
+        self.leave = function() {
+            model.send_message('leave');
+            _.delay(function() {
+                self.userTriggeredDisconnect(true);
+                self.navToStart();
+            }, 30);
+        };
+
+        // signal from server_browser.  indicates that the player wants to join a spectator spot
+        self.tryToSpectate = ko.observable().extend({ session: 'try_to_spectate' });
+        self.playersWithoutArmies = ko.observableArray([]);
+
+        self.allPlayersAreReady = ko.observable(false);
+
+        self.thisPlayerIsReady = ko.observable(false);
+
+        self.startingGameCountdown = ko.observable(-1);
+        self.showStartingGameCountdown = ko.computed(function () {
+            return self.startingGameCountdown() !== -1;
+        });
+
+        self.spectatorLimit = ko.observable(1);
+        self.spectatorLimitLock = ko.observable(true);
+        self.spectatorLimit.subscribe(function (value) {
+            if (self.spectatorLimitLock())
+                return;
+            self.changeSettings();
+        });
+
+        self.spectators = ko.observableArray([]);
+
+        self.spectatorSlots = ko.observableArray([]);
+
+        self.spectatorCount = ko.computed(function() {
+            return self.spectators().length;
+        });
+        self.emptySpectatorSlots = ko.computed(function() {
+// avoid negative when format changed creating players without armies
+            return Math.max(0, self.spectatorLimit() - self.spectatorCount());
+        });
+
+        self.showSpectators = ko.computed(function () {
+            return self.spectatorLimit() > 0 || self.spectatorCount();
+        });
+
+        // Set up dynamic sizing elements
+        self.containerHeight = ko.observable('600px');
+        self.containerWidth = ko.observable('600px');
+        self.armyListHeight = ko.observable('600');
+        self.armyListHeightMinusSpectators = ko.computed(function () {
+            return self.armyListHeight() - (self.showSpectators() ? 108 : 0);
+        });
+
+        self.armyListHeightString = ko.computed(function () {
+            return '' + self.armyListHeightMinusSpectators() + 'px';
+        });
+
+        self.chatHeight = ko.observable('400px');
+
+        self.chatSelected = ko.observable(false);
+        self.chatMessages = ko.observableArray([]);
+        self.sendChat = function (message) {
+            var msg = {};
+            msg.message = $(".input_chat_text").val();
+
+            if (msg.message) {
+                model.send_message("chat_message", msg);
+            }
+            msg.message = $(".input_chat_text").val("");
+        };
+
+        self.localChatMessage = function(name, message) {
+            model.chatMessages.push(new ChatMessageViewModel(name, 'mod', message));
+        };
+
+        self.devMode = ko.observable().extend({ session: 'dev_mode' });
+        self.signedInToUbernet = ko.observable().extend({ session: 'signed_in_to_ubernet' });
+
+        self.username = ko.observable().extend({ local: 'uberName' });
+        self.uberName = self.username; // deprecated
+
+        self.displayName = ko.observable('').extend({ session: 'displayName' });
+        if (!self.displayName())
+            self.displayName('Player');
+
+        self.userId = api.net.userId;
+        self.uberId = api.net.uberId; // deprecated;
+
+        self.preferredCommander = ko.observable().extend({ local: 'preferredCommander_v2' });
+        self.preferredCommanderValid = ko.computed(function() {
+            var commander = self.preferredCommander();
+            if (_.has(commander, 'UnitSpec'))
+                return true;
+            else
+                return _.isString(commander);
+        });
+
+        self.commanders = ko.observableArray([]);
+        self.aiCommanders = ko.observableArray([]);
+
+        self.updateCommanders = function(commanders)
+        {
+            var commanders = CommanderUtility.getKnownCommanders();
+            self.aiCommanders(commanders);
+            self.commanders(_.filter(commanders, function(commander) {
+                // need a better way to do this
+                var spec = CommanderUtility.bySpec.getSpec(commander) || {};
+                return spec.custom || PlayFab.isCommanderOwned(CommanderUtility.bySpec.getObjectName(commander));
+            }));
+        }
+
+        CommanderUtility.afterCommandersLoaded(function()
+        {
+           self.updateCommanders();
+            if (!self.returnFromLoad())
+                self.usePreferredCommander();
+        });
+
+        self.selectedCommanderIndex = ko.observable(-1).extend({ session: 'selectedCommander' });
+        self.selectedCommander = ko.computed(function () {
+            // If we haven't gotten a commander list yet, just return nothin'.
+            if (!self.commanders() || !self.commanders().length)
+                return null;
+
+            var index = self.selectedCommanderIndex();
+
+            if (index === -1) { /* if nothing is selected, either use the preferred cmdr or the first cmdr in the list */
+                if (self.preferredCommanderValid())
+                {
+                    var commander = self.preferredCommander();
+                    if (_.has(commander, 'UnitSpec'))
+                        return commander.UnitSpec;
+                    else
+                        return commander;
+                }
+                index = 0;
+            }
+
+			return self.commanders()[index];
+        });
+
+        self.usePreferredCommander = function () {
+            if (!self.preferredCommanderValid())
+                return;
+
+            self.selectedCommanderIndex(-1);
+            self.send_message('update_commander', {
+                commander: self.selectedCommander()
+            });
+        };
+
+        self.setCommander = function (index) {
+            if (model.thisPlayerIsReady())
+                return;
+
+            self.selectedCommanderIndex(index % self.commanders().length);
+
+            model.send_message('update_commander',
+            {
+                commander: self.selectedCommander()
+            });
+        }
+
+        self.changeCommander = function () {
+            self.setCommander(self.selectedCommanderIndex() + 1)
+        };
+
+        self.selectedAI = ko.observable(null);
+
+        self.setAICommander = function (player_id, commander)
+        {
+            model.send_message('set_ai_commander',
+            {
+                id: player_id,
+                ai_commander: commander
+            });
+        }
+
+        self.gameType       = ko.observable('FreeForAll').extend({ session: 'game_type' });
+        self.isFFAGame      = ko.computed(function() { return self.gameType() === 'FreeForAll'; });
+        self.isTeamGame     = ko.computed(function() { return self.gameType() === 'TeamArmies'; });
+        self.isVersusAIGame = ko.computed(function() { return self.gameType() === 'VersusAI'; });
+        self.gwTechCardSlotCountLock = ko.observable(false);
+        self.gwTechCardSlotCount = ko.observable(0);
+        self.gwTechCardsActiveSession = ko.observable(false).extend({ session: 'gw_tech_cards_active' });
+        self.gwTechCardsActiveSession(false);
+        self.gwTechCardSlotCountInput = ko.observable(0).extend({ rateLimit: { timeout: 750, method: "notifyWhenChangesStop" } });
+        self.gwTechCardSlotCountInput.subscribe(function(value) {
+            var count = normalizeGwTechSlotCount(value);
+            if (count !== Number(value)) {
+                self.gwTechCardSlotCountInput(count);
+            }
+            self.gwTechCardSlotCount(count);
+        });
+        self.gwTechCardSlotCount.subscribe(function(value) {
+            self.gwTechCardSlotCountInput(value);
+            if (value <= 0) {
+                self.gwTechCardsActiveSession(false);
+            }
+            if (value > 0 && self.loadGwTechModules) {
+                self.loadGwTechModules();
+            }
+            _.forEach(self.armies(), function(army) {
+                _.forEach(army.slots(), function(slot) {
+                    slot.gwTechCards(normalizeGwTechCards(slot.gwTechCards(), value));
+                });
+            });
+            if (!self.gwTechCardSlotCountLock()) {
+                self.changeSettings();
+            }
+        });
+        self.gwTechModulesReady = ko.observable(false);
+        self.gwTechModulesLoading = ko.observable(false);
+        self.gwInventoryModule = null;
+        self.gwDealerModule = null;
+        self.gwTechLoadoutOptions = ko.observableArray([]);
+        self.gwTechCardOptions = ko.observableArray([]);
+        self.gwTechCardModules = {};
+        self.gwTechCardEvaluationErrorLog = {};
+        self.gwTechPresets = ko.observableArray(loadGwTechPresetsFromStorage());
+        self.gwoMounted = ko.observable(false);
+        self.gwTechInspectorVisible = ko.observable(false);
+        self.gwTechInspectorCard = ko.observable();
+        self.gwTechInspectorLeft = ko.observable(0);
+        self.gwTechInspectorTop = ko.observable(0);
+
+        self.persistGwTechPresets = function() {
+            saveGwTechPresetsToStorage(self.gwTechPresets());
+        };
+        self.findGwTechLoadoutOptionById = function(loadoutId) {
+            return _.find(self.gwTechLoadoutOptions(), function(option) {
+                return option && option.id === loadoutId;
+            });
+        };
+        self.findGwTechCardOptionById = function(cardId) {
+            return _.find(self.gwTechCardOptions(), function(option) {
+                return option && option.id === cardId;
+            });
+        };
+        self.findGwTechPresetByName = function(name) {
+            var normalized = normalizeGwTechSearchText(name || '');
+            return _.find(self.gwTechPresets(), function(preset) {
+                return normalizeGwTechSearchText(preset && preset.name || '') === normalized;
+            });
+        };
+        self.saveGwTechPreset = function(preset) {
+            var normalized = normalizeGwTechPreset(_.assign({}, preset, { updated_at: Date.now() }));
+            var presets = _.reject(self.gwTechPresets(), function(existing) {
+                return existing && existing.id === normalized.id;
+            });
+
+            presets.push(normalized);
+            presets = _.sortBy(presets, function(item) {
+                return normalizeGwTechSearchText(item.name);
+            });
+            self.gwTechPresets(presets);
+            self.persistGwTechPresets();
+            return normalized;
+        };
+        self.renameGwTechPreset = function(preset, name, replacedPreset) {
+            var normalized = normalizeGwTechPreset(_.assign({}, preset, {
+                name: name,
+                updated_at: Date.now()
+            }));
+            var presets = _.reject(self.gwTechPresets(), function(existing) {
+                return existing && (existing.id === normalized.id || (replacedPreset && existing.id === replacedPreset.id));
+            });
+
+            presets.push(normalized);
+            presets = _.sortBy(presets, function(item) {
+                return normalizeGwTechSearchText(item.name);
+            });
+            self.gwTechPresets(presets);
+            self.persistGwTechPresets();
+            return normalized;
+        };
+        self.deleteGwTechPreset = function(presetId) {
+            self.gwTechPresets(_.reject(self.gwTechPresets(), function(existing) {
+                return existing && existing.id === presetId;
+            }));
+            self.persistGwTechPresets();
+        };
+
+        self.positionGwTechInspector = function(event) {
+            if (!event) {
+                return;
+            }
+
+            var width = 360;
+            var height = 270;
+            var margin = 18;
+            var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 1280;
+            var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 720;
+            var left = event.clientX + margin;
+            var top = event.clientY + margin;
+
+            if (left + width > viewportWidth) {
+                left = event.clientX - width - margin;
+            }
+            if (top + height > viewportHeight) {
+                top = viewportHeight - height - margin;
+            }
+
+            self.gwTechInspectorLeft(Math.max(16, left));
+            self.gwTechInspectorTop(Math.max(16, top));
+        };
+        self.showGwTechInspector = function(card, event) {
+            if (!card) {
+                console.log('[GW TECH] Cannot inspect missing tech card.');
+                return;
+            }
+
+            self.gwTechInspectorCard(card);
+            self.positionGwTechInspector(event);
+            self.gwTechInspectorVisible(true);
+        };
+        self.moveGwTechInspector = function(event) {
+            if (self.gwTechInspectorVisible()) {
+                self.positionGwTechInspector(event);
+            }
+        };
+        self.hideGwTechInspector = function() {
+            self.gwTechInspectorVisible(false);
+            self.gwTechInspectorCard(undefined);
+        };
+
+        self.loadGwTechCardModule = function(cardId) {
+            var done = $.Deferred();
+
+            requireGW(['cards/' + cardId], function(card) {
+                if (card) {
+                    card.id = cardId;
+                }
+                done.resolve(card);
+            }, function() {
+                done.resolve(undefined);
+            });
+
+            return done.promise();
+        };
+
+        self.dealGwTechStartCard = function(loadout, inventory) {
+            var done = $.Deferred();
+
+            self.loadGwTechCardModule(loadout).then(function(card) {
+                if (!card) {
+                    done.reject('Unable to load start card ' + loadout);
+                    return;
+                }
+
+                try {
+                    var context = card.getContext && card.getContext(GW_TECH_FAKE_GALAXY, inventory);
+                    var deal = card.deal && card.deal(GW_TECH_FAKE_STAR, context, inventory);
+                    var product = { id: loadout };
+                    var cardParams = deal && deal.params;
+
+                    if (cardParams && _.isObject(cardParams)) {
+                        _.assign(product, cardParams);
+                    }
+
+                    if (card.keep) {
+                        card.keep(deal, context);
+                    }
+                    if (card.releaseContext) {
+                        card.releaseContext(context);
+                    }
+
+                    done.resolve(product);
+                }
+                catch (e) {
+                    done.reject(e);
+                }
+            });
+
+            return done.promise();
+        };
+
+        self.loadGwTechModules = function() {
+            if (self.gwTechModulesReady() || self.gwTechModulesLoading()) {
+                return;
+            }
+
+            if (!window.requireGW) {
+                console.error('requireGW is not available for custom lobby tech-card UI.');
+                return;
+            }
+
+            self.gwTechModulesLoading(true);
+            api.mods.getMounted('client', true).then(function(mountedMods) {
+                self.gwoMounted(isGwoMounted(mountedMods));
+
+                requireGW([
+                    'shared/gw_inventory',
+                    'shared/gw_start_loadouts',
+                    'pages/gw_start/gw_dealer'
+                ], function(
+                    GWInventory,
+                    GWStartLoadouts,
+                    GWDealer
+                ) {
+                    self.gwInventoryModule = GWInventory;
+                    self.gwDealerModule = GWDealer;
+                    setupGwoTechGlobals();
+
+                    var loadoutOptionsById = {};
+                    var loadoutOptions = [new GwTechPickerOptionViewModel({
+                        id: VANILLA_GW_TECH_LOADOUT,
+                        card: makeVanillaGwTechLoadoutCard()
+                    })];
+
+                    _.forEach(GWStartLoadouts.all(), function(cardData) {
+                        loadoutOptionsById[cardData.id] = true;
+                        loadoutOptions.push(new GwTechPickerOptionViewModel({
+                            id: cardData.id,
+                            card: new CardViewModel(cardData)
+                        }));
+                    });
+
+                    var finishLoadoutOptions = function() {
+                        self.gwTechLoadoutOptions(loadoutOptions);
+                    };
+
+                    var loadGwoLoadouts = function() {
+                        if (!self.gwoMounted()) {
+                            finishLoadoutOptions();
+                            return $.Deferred().resolve().promise();
+                        }
+
+                        var loadoutLoads = _.map(GWO_LOADOUT_IDS, function(loadoutId) {
+                            return self.loadGwTechCardModule(loadoutId).then(function(card) {
+                                if (!card || loadoutOptionsById[loadoutId]) {
+                                    return;
+                                }
+
+                                loadoutOptionsById[loadoutId] = true;
+                                loadoutOptions.push(new GwTechPickerOptionViewModel({
+                                    id: loadoutId,
+                                    card: new CardViewModel({ id: loadoutId })
+                                }));
+                            });
+                        });
+
+                        return $.when.apply($, loadoutLoads).then(finishLoadoutOptions, finishLoadoutOptions);
+                    };
+
+                    var appendCardOption = function(options, seenCards, card) {
+                        if (!card || !_.isString(card.id) || seenCards[card.id]) {
+                            return;
+                        }
+                        if (!isGwTechCardId(card.id) || GW_TECH_CARD_EXCLUDES[card.id]) {
+                            return;
+                        }
+                        if (_.isFunction(card.visible) && card.visible({}) !== true) {
+                            return;
+                        }
+                        if (card.visible && !_.isFunction(card.visible) && card.visible !== true) {
+                            return;
+                        }
+
+                        seenCards[card.id] = true;
+                        self.gwTechCardModules[card.id] = card;
+                        options.push(new GwTechPickerOptionViewModel({
+                            id: card.id,
+                            card: new CardViewModel({ id: card.id })
+                        }));
+                    };
+
+                    var loadGwoCards = function(options, seenCards) {
+                        if (!self.gwoMounted()) {
+                            return $.Deferred().resolve().promise();
+                        }
+
+                        var cardLoads = _.map(GWO_TECH_CARD_IDS, function(cardId) {
+                            return self.loadGwTechCardModule(cardId).then(function(card) {
+                                appendCardOption(options, seenCards, card);
+                            });
+                        });
+
+                        return $.when.apply($, cardLoads);
+                    };
+
+                    $.when(loadGwoLoadouts(), GWDealer.allCards()).then(function(ignore, cards) {
+                        var options = [];
+                        var seenCards = {};
+
+                        _.forEach(cards || [], function(card) {
+                            appendCardOption(options, seenCards, card);
+                        });
+
+                        loadGwoCards(options, seenCards).always(function() {
+                            self.gwTechCardOptions(options);
+                            self.gwTechModulesReady(true);
+                            self.gwTechModulesLoading(false);
+                        });
+                    }, function(reason) {
+                        console.error('Failed loading custom lobby tech-card data: ' + JSON.stringify(reason));
+                        self.gwTechModulesLoading(false);
+                    });
+                });
+            }, function(reason) {
+                console.error('Failed checking mounted mods for custom lobby tech-card data: ' + JSON.stringify(reason));
+                self.gwTechModulesLoading(false);
+            });
+        };
+
+        self.buildGwTechInventory = function(slot, slotIndex) {
+            var result = $.Deferred();
+
+            if (!self.gwInventoryModule || !self.gwDealerModule) {
+                result.reject('GW tech modules are not loaded.');
+                return result.promise();
+            }
+
+            if (isVanillaGwTechLoadout(slot.gwTechLoadout())) {
+                var vanillaInventory = ensureGwoTechInventoryCompatibility(new self.gwInventoryModule());
+                vanillaInventory.load({
+                    cards: [],
+                    tags: {
+                        global: {
+                            commander: slot.commander()
+                        }
+                    }
+                });
+                result.resolve(vanillaInventory);
+                return result.promise();
+            }
+
+            setupGwoTechGlobals();
+
+            var dealInventory = ensureGwoTechInventoryCompatibility(new self.gwInventoryModule());
+            dealInventory.setTag('global', 'commander', slot.commander());
+            self.dealGwTechStartCard(slot.gwTechLoadout(), dealInventory).then(function(startCardProduct) {
+                var inventory = ensureGwoTechInventoryCompatibility(new self.gwInventoryModule());
+                var cards = [startCardProduct || { id: slot.gwTechLoadout() }];
+                var selectedCards = slot.gwTechCards().slice(0, slotIndex);
+
+                _.forEach(selectedCards, function(cardId) {
+                    cards.push({ id: cardId });
+                });
+
+                inventory.load({
+                    cards: cards,
+                    tags: {
+                        global: {
+                            commander: slot.commander()
+                        }
+                    }
+                });
+                inventory.applyCards(function() {
+                    result.resolve(inventory);
+                });
+            }, function(reason) {
+                result.reject(reason);
+            });
+
+            return result.promise();
+        };
+
+        self.gwTechCardHasChance = function(cardId, inventory) {
+            var card = self.gwTechCardModules[cardId];
+            if (!card) {
+                return false;
+            }
+
+            if (inventory.hasCard(cardId)) {
+                return false;
+            }
+
+            try {
+                var context = card.getContext && card.getContext(GW_TECH_FAKE_GALAXY, inventory);
+                var deal = card.deal && card.deal(GW_TECH_FAKE_STAR, context, inventory);
+                var chance = deal && Number(deal.chance);
+                if (card.releaseContext) {
+                    card.releaseContext(context);
+                }
+                return _.isFinite(chance) && chance > 0;
+            }
+            catch (e) {
+                var detail = e && (e.stack || e.message || JSON.stringify(e)) || String(e);
+                var key = cardId + ':' + detail;
+                if (!self.gwTechCardEvaluationErrorLog[key]) {
+                    self.gwTechCardEvaluationErrorLog[key] = true;
+                    console.error('Failed evaluating GW tech card ' + cardId + ': ' + detail);
+                }
+                return false;
+            }
+        };
+
+        self.buildGwTechAllowedCardMap = function(slot, slotIndex) {
+            var result = $.Deferred();
+
+            self.buildGwTechInventory(slot, slotIndex).then(function(inventory) {
+                var allowed = {};
+                _.forEach(self.gwTechCardOptions(), function(option) {
+                    allowed[option.id] = self.gwTechCardHasChance(option.id, inventory);
+                });
+                result.resolve(allowed);
+            }, function(reason) {
+                result.reject(reason);
+            });
+
+            return result.promise();
+        };
+
+        self.validateGwTechPresetForSlot = function(slot, preset) {
+            var result = $.Deferred();
+            var normalizedPreset = normalizeGwTechPreset(preset);
+            var slotCount = self.gwTechCardSlotCount();
+            var tempCards = ko.observableArray([]);
+            var tempSlot = {
+                gwTechLoadout: ko.observable(normalizedPreset.loadout),
+                gwTechCards: tempCards,
+                commander: slot.commander
+            };
+
+            if (!self.gwTechModulesReady()) {
+                result.reject(loc('!LOC:Tech card data is still loading.'));
+                return result.promise();
+            }
+
+            if (!self.findGwTechLoadoutOptionById(normalizedPreset.loadout)) {
+                result.reject(loc('!LOC:Preset loadout is not available.'));
+                return result.promise();
+            }
+
+            if (normalizedPreset.cards.length > slotCount) {
+                result.reject(loc('!LOC:Preset has more tech cards than this lobby allows.'));
+                return result.promise();
+            }
+
+            if (isVanillaGwTechLoadout(normalizedPreset.loadout) && normalizedPreset.cards.length) {
+                result.reject(loc('!LOC:Vanilla Commander presets cannot include tech cards.'));
+                return result.promise();
+            }
+
+            var missingCard = _.find(normalizedPreset.cards, function(cardId) {
+                return !self.findGwTechCardOptionById(cardId);
+            });
+            if (missingCard) {
+                result.reject(loc('!LOC:Preset card is not available: ') + missingCard);
+                return result.promise();
+            }
+
+            var checkIndex = function(index) {
+                if (index >= normalizedPreset.cards.length) {
+                    result.resolve(normalizedPreset);
+                    return;
+                }
+
+                self.buildGwTechInventory(tempSlot, index).then(function(inventory) {
+                    var cardId = normalizedPreset.cards[index];
+                    if (!self.gwTechCardHasChance(cardId, inventory)) {
+                        result.reject(loc('!LOC:Preset card is not valid at slot ') + (index + 1) + ': ' + cardId);
+                        return;
+                    }
+
+                    tempCards.push(cardId);
+                    checkIndex(index + 1);
+                }, function(reason) {
+                    result.reject(reason || loc('!LOC:Unable to validate preset.'));
+                });
+            };
+
+            checkIndex(0);
+            return result.promise();
+        };
+
+        self.findFirstInvalidGwTechCardIndex = function(slot) {
+            var result = $.Deferred();
+            var cards = slot.gwTechCards().slice(0);
+
+            var checkIndex = function(index) {
+                if (index >= cards.length) {
+                    result.resolve(-1);
+                    return;
+                }
+
+                self.buildGwTechInventory(slot, index).then(function(inventory) {
+                    if (!self.gwTechCardHasChance(cards[index], inventory)) {
+                        result.resolve(index);
+                        return;
+                    }
+
+                    checkIndex(index + 1);
+                }, function() {
+                    result.resolve(index);
+                });
+            };
+
+            checkIndex(0);
+            return result.promise();
+        };
+
+        self.gwTechLaunchInProgress = ko.observable(false);
+        self.gwTechConfigMounted = ko.observable(false);
+        self.gwTechConfigMountInProgress = false;
+
+        self.publishRequiredClientModsForGwTech = function() {
+            var done = $.Deferred();
+
+            api.mods.getMounted('client', true).then(function(mountedMods) {
+                var manifest = buildClientModManifest(mountedMods);
+                var requiredIdentifiers = manifest.active_required_identifiers || [];
+                var requiredNamesById = manifest.active_required_names_by_id || {};
+
+                try {
+                    sessionStorage.setItem(REQUIRED_CLIENT_MODS_SESSION_KEY, JSON.stringify(requiredIdentifiers));
+                } catch (e) {
+                }
+
+                self.send_message('set_required_client_mods', {
+                    required_identifiers: requiredIdentifiers,
+                    required_names_by_id: requiredNamesById
+                }, function(success, response) {
+                    if (!success) {
+                        done.reject(response || 'set_required_client_mods failed');
+                        return;
+                    }
+
+                    done.resolve(requiredIdentifiers);
+                });
+            }, function(reason) {
+                try {
+                    sessionStorage.setItem(REQUIRED_CLIENT_MODS_SESSION_KEY, JSON.stringify([]));
+                } catch (e) {
+                }
+
+                self.send_message('set_required_client_mods', {
+                    required_identifiers: [],
+                    required_names_by_id: {}
+                }, function(success, response) {
+                    if (!success) {
+                        done.reject(response || reason || 'set_required_client_mods failed');
+                        return;
+                    }
+
+                    done.resolve([]);
+                });
+            });
+
+            return done.promise();
+        };
+
+        self.collectGwTechOwnersForCook = function() {
+            var owners = [];
+
+            _.forEach(self.armies(), function(army) {
+                var occupiedSlots = _.filter(army.slots(), function(slot) {
+                    return slot.isPlayer();
+                });
+
+                if (!occupiedSlots.length) {
+                    return;
+                }
+
+                var addOwner = function(slot) {
+                    var color = slot.rawColor();
+                    if (!_.isArray(color) || color.length < 2) {
+                        color = [[255, 255, 255], [0, 0, 0]];
+                    }
+
+                    var commanders = [slot.commander()];
+                    if (army.sharedArmy()) {
+                        commanders = _.map(occupiedSlots, function(occupiedSlot) {
+                            return occupiedSlot.commander();
+                        });
+                    }
+
+                    owners.push({
+                        owner_key: army.sharedArmy() ? ('army:' + army.index()) : ('slot:' + army.index() + ':' + slot.index()),
+                        army_index: army.index(),
+                        slot_index: slot.index(),
+                        shared_army: army.sharedArmy(),
+                        player_id: slot.playerId(),
+                        client_id: slot.ai() ? undefined : slot.playerId(),
+                        client_name: slot.ai() ? undefined : slot.playerName(),
+                        player_name: slot.playerName(),
+                        ai: slot.ai(),
+                        commander: slot.commander(),
+                        commanders: _.uniq(_.filter(commanders, _.isString)),
+                        color: color,
+                        personality: slot.ai() ? _.cloneDeep(model.aiPersonalities()[slot.aiPersonality()] || {}) : undefined,
+                        loadout: slot.gwTechLoadout(),
+                        vanilla: isVanillaGwTechLoadout(slot.gwTechLoadout()),
+                        cards: isVanillaGwTechLoadout(slot.gwTechLoadout()) ? [] : slot.gwTechCards().slice(0)
+                    });
+                };
+
+                if (army.sharedArmy()) {
+                    addOwner(occupiedSlots[0]);
+                    return;
+                }
+
+                _.forEach(occupiedSlots, addOwner);
+            });
+
+            return owners;
+        };
+
+        self.cookGwTechConfig = function() {
+            var done = $.Deferred();
+            var owners = self.collectGwTechOwnersForCook();
+
+            if (!owners.length) {
+                done.reject('No occupied tech-card slots to cook.');
+                return done.promise();
+            }
+
+            self.publishRequiredClientModsForGwTech().then(function(requiredIdentifiers) {
+                runWithRequiredClientModsOnly(requiredIdentifiers || [], function() {
+                    var cookDone = $.Deferred();
+
+                    requireGW(['shared/gw_custom_lobby_tech_referee'], function(GWCustomLobbyTechReferee) {
+                        GWCustomLobbyTechReferee.cook(owners).then(function(config) {
+                            cookDone.resolve(config);
+                        }, function(reason) {
+                            cookDone.reject(reason);
+                        });
+                    }, function(reason) {
+                        cookDone.reject(reason || 'Failed to load custom lobby tech referee.');
+                    });
+
+                    return cookDone.promise();
+                }).then(function(config) {
+                    done.resolve(config);
+                }, function(reason) {
+                    done.reject(reason);
+                });
+            }, function(reason) {
+                done.reject(reason);
+            });
+
+            return done.promise();
+        };
+
+        self.parseGwTechFileValue = function(value) {
+            if (!_.isString(value)) {
+                return value;
+            }
+
+            try {
+                return parse(value);
+            } catch (e) {
+                return undefined;
+            }
+        };
+
+        self.stripGwTechUnitTag = function(unit, tag) {
+            if (!_.isString(unit) || !tag || unit.slice(-tag.length) !== tag) {
+                return unit;
+            }
+
+            return unit.slice(0, -tag.length);
+        };
+
+        self.discoverGwTechTaggedUnitLists = function(files) {
+            var taggedLists = [];
+
+            _.forEach(files || {}, function(value, path) {
+                if (!_.isString(path) || path.indexOf(UNIT_LIST_PATH) !== 0) {
+                    return;
+                }
+
+                var tag = path.slice(UNIT_LIST_PATH.length);
+                if (!tag) {
+                    return;
+                }
+
+                var unitList = self.parseGwTechFileValue(value);
+                if (!unitList || !_.isArray(unitList.units)) {
+                    return;
+                }
+
+                taggedLists.push({
+                    path: path,
+                    tag: tag,
+                    units: _.map(unitList.units, function(unit) {
+                        return self.stripGwTechUnitTag(unit, tag);
+                    })
+                });
+            });
+
+            return taggedLists;
+        };
+
+        self.buildGwTechUntaggedUnitListFromFiles = function(files) {
+            var units = [];
+
+            _.forEach(self.discoverGwTechTaggedUnitLists(files), function(taggedList) {
+                var unitList = self.parseGwTechFileValue(files[taggedList.path]);
+                if (unitList && _.isArray(unitList.units)) {
+                    units = units.concat(unitList.units);
+                }
+            });
+
+            return { units: _.uniq(units) };
+        };
+
+        self.buildGwTechLocalOverlayFiles = function(sharedFiles, tagAssignments) {
+            var done = $.Deferred();
+            var taggedUnitLists = self.discoverGwTechTaggedUnitLists(sharedFiles);
+
+            requireGW(['shared/gw_common'], function(GW) {
+                var titans = api.content.usingTitans();
+                var aiMapLoad = $.get('spec://pa/ai/unit_maps/ai_unit_map.json');
+                var aiX1MapLoad = titans ? $.get('spec://pa/ai/unit_maps/ai_unit_map_x1.json') : $.Deferred().resolve([{}]);
+
+                $.when(aiMapLoad, aiX1MapLoad).then(function(aiMapGet, aiX1MapGet) {
+                    var aiUnitMap = parse(aiMapGet[0]);
+                    var aiX1UnitMap = parse(aiX1MapGet[0]);
+                    var filesToProcess = [];
+
+                    var generateInventoryOverlayFiles = function(units, mods, tag) {
+                        var overlayDone = $.Deferred();
+
+                        if (!_.isString(tag) || !tag.length || !_.isArray(units) || !_.isArray(mods)) {
+                            overlayDone.resolve({});
+                            return overlayDone.promise();
+                        }
+
+                        var playerAIUnitMap = GW.specs.genAIUnitMap(aiUnitMap, tag);
+                        var playerX1AIUnitMap = titans ? GW.specs.genAIUnitMap(aiX1UnitMap, tag) : {};
+
+                        GW.specs.genUnitSpecs(units, tag).then(function(playerSpecFiles) {
+                            var playerFilesClassic = {};
+                            var playerFilesX1 = {};
+
+                            playerFilesClassic['/pa/ai/unit_maps/ai_unit_map.json' + tag] = playerAIUnitMap;
+                            if (titans) {
+                                playerFilesX1['/pa/ai/unit_maps/ai_unit_map_x1.json' + tag] = playerX1AIUnitMap;
+                            }
+
+                            var playerFiles = _.assign({}, playerFilesClassic, playerFilesX1, playerSpecFiles);
+
+                            try {
+                                GW.specs.modSpecs(playerFiles, mods, tag);
+                            } catch (e) {
+                                console.log('[GW TECH] local overlay modSpecs failed tag=' + tag + ' error=' + JSON.stringify(e));
+                            }
+
+                            overlayDone.resolve(playerFiles);
+                        }, function() {
+                            overlayDone.resolve({});
+                        });
+
+                        return overlayDone.promise();
+                    };
+
+                    _.forEach(taggedUnitLists, function(taggedList) {
+                        var assignment = _.find(tagAssignments || [], function(candidate) {
+                            return candidate && candidate.tag === taggedList.tag;
+                        });
+
+                        if (!assignment || !_.isArray(assignment.inventory_mods)) {
+                            return;
+                        }
+
+                        filesToProcess.push(generateInventoryOverlayFiles(taggedList.units, assignment.inventory_mods, taggedList.tag));
+                    });
+
+                    if (!filesToProcess.length) {
+                        done.resolve({});
+                        return;
+                    }
+
+                    $.when.apply($, filesToProcess).then(function() {
+                        done.resolve(_.assign.apply(_, [{}].concat(Array.prototype.slice.call(arguments))));
+                    });
+                }, function() {
+                    done.resolve({});
+                });
+            }, function() {
+                done.resolve({});
+            });
+
+            return done.promise();
+        };
+
+        self.mountGwTechConfig = function(payload) {
+            var done = $.Deferred();
+
+            if (!payload || !payload.files) {
+                done.reject('No GW tech config files.');
+                return done.promise();
+            }
+
+            if (self.gwTechConfigMountInProgress) {
+                done.resolve();
+                return done.promise();
+            }
+
+            self.gwTechConfigMountInProgress = true;
+            self.gwTechConfigMounted(false);
+
+            if (!payload.files[UNIT_LIST_PATH]) {
+                payload.files[UNIT_LIST_PATH] = self.buildGwTechUntaggedUnitListFromFiles(payload.files);
+            }
+
+            self.buildGwTechLocalOverlayFiles(payload.files, payload.tag_assignments).always(function(localOverlayFiles) {
+                var mergedFiles = _.assign({}, payload.files, _.isObject(localOverlayFiles) ? localOverlayFiles : {});
+                var cookedFiles = _.mapValues(mergedFiles, function(value) {
+                    if (typeof value !== 'string') {
+                        return JSON.stringify(value);
+                    }
+                    return value;
+                });
+
+                api.file.mountMemoryFiles(cookedFiles).then(function() {
+                    var unitSpecTag = (_.has(payload, 'unit_spec_tag') && _.isString(payload.unit_spec_tag))
+                        ? payload.unit_spec_tag
+                        : '.player';
+                    var gwTechCardsActive = ko.observable(false).extend({ session: 'gw_tech_cards_active' });
+                    var gwCampaignUnitSpecTag = ko.observable('.player').extend({ session: 'gw_campaign_unit_spec_tag' });
+
+                    gwTechCardsActive(true);
+                    gwCampaignUnitSpecTag(unitSpecTag);
+                    api.game.setUnitSpecTag(unitSpecTag);
+                    self.gwTechConfigMounted(true);
+                    self.gwTechConfigMountInProgress = false;
+                    self.send_message('gw_tech_config_ready', {});
+                    done.resolve();
+                }, function(reason) {
+                    self.gwTechConfigMountInProgress = false;
+                    done.reject(reason || 'Failed to mount GW tech config.');
+                });
+            });
+
+            return done.promise();
+        };
+
+        self.allowSpectate = ko.computed(function () {
+            if (self.thisPlayerIsReady())
+                return false;
+
+            return self.emptySpectatorSlots() > 0
+                    && !_.contains(_.pluck(self.spectators(), 'name'), self.displayName())
+        });
+
+        self.leaveArmy = function (options /* force */) {
+
+            if (self.thisPlayerIsReady() && !options.force)
+                return;
+
+            if (!self.allowSpectate() && !options.force)
+                return;
+
+            model.send_message('leave_army');
+        };
+
+        self.changeSettings = function () {
+            if (!self.isGameCreator())
+                return;
+
+            var payload = {
+                'spectators': Number(self.spectatorLimit()),
+                'password': self.privateGamePassword(),
+                'friends': self.whitelist(),
+                'public': self.isPublicGame(),
+                'blocked': self.blocked(),
+                'tag': self.tag(),
+                'game_name': self.gameName(),
+                'game_options': {
+                    'game_type': self.gameType(),
+                    'listen_to_spectators': self.listenToSpectators(),
+                    'land_anywhere': self.landAnywhere(),
+                    'dynamic_alliances': self.dynamicAlliances(),
+                    'dynamic_alliance_victory': self.dynamicAllianceVictory(),
+                    'eradication_mode':self.eradicationMode(),
+                    'eradication_mode_sub_commanders':self.eradicationModeSubCommanders(),
+                    'eradication_mode_factories':self.eradicationModeFactories(),
+                    'eradication_mode_fabricators':self.eradicationModeFabricators(),
+                    'bounty_mode': self.isTitansGame() && self.bountyMode(),
+                    'bounty_value': self.bountyValue(),
+                    'sandbox': self.sandbox(),
+                    'sudden_death_mode': self.suddenDeathMode(),
+                    'shuffle_landing_zones': self.shuffleLandingZones(),
+                    'gw_tech_card_slots': self.gwTechCardSlotCount()
+                }
+            }
+
+
+            model.send_message('modify_settings', payload);
+        };
+
+        self.showUPnPError = ko.observable(false);
+
+        self.requestUPNPStatus = function () {
+            if (!self.isGameCreator() || self.returnFromLoad())
+                return;
+
+            if (api.net.effectiveLocalHostTransport() !== 'UPNP')
+                return;
+
+            model.send_message('upnp_status', {}, function (success, response) {
+                if (success)
+                    self.handleUPNPStatus(response);
+                else
+                    setTimeout(self.requestUPNPStatus, 1000);
+            });
+        };
+
+        self.handleUPNPStatus = function (status) {
+            console.log('Got uPNP status: ' + status + ', is game creator: ' + self.isGameCreator());
+            if (!self.isGameCreator())
+                return;
+
+            if (status == "" || status == undefined) {
+                setTimeout(self.requestUPNPStatus, 1000);
+            } else if (status != "OK") {
+                $("#errorText").text(status);
+                $("#error").dialog('open');
+                self.showUPnPError(true);
+            }
+        };
+
+        self.changeBouncer = function () {
+            if (!self.isGameCreator())
+                return;
+
+            model.send_message('modify_bouncer', {
+                'password': self.privateGamePassword(),
+                'friends': self.whitelist(),
+                'blocked': self.blocked()
+            });
+        }
+
+        self.kickUser = function (user_id) {
+            api.debug.log('kick', user_id);
+            self.send_message('kick', { 'id': user_id });
+        };
+
+        self.lobbyId = ko.observable().extend({ session: 'lobbyId' });
+        self.gameTicket = ko.observable().extend({ session: 'gameTicket' });
+        self.gameHostname = ko.observable().extend({ session: 'gameHostname' });
+        self.gamePort = ko.observable().extend({ session: 'gamePort' });
+        self.isLocalGame = ko.observable().extend({ session: 'is_local_game' });
+        self.gameModIdentifiers = ko.observableArray().extend({ session: 'game_mod_identifiers' });
+        self.serverType = ko.observable().extend({ session: 'game_server_type' });
+        self.serverSetup = ko.observable().extend({ session: 'game_server_setup' });
+
+        self.isFriendsOnlyGame = ko.observable(false);
+        self.setFriendsOnlyGame = function () {
+            self.isFriendsOnlyGame(true);
+            self.isPublicGame(false);
+            self.changeSettings();
+        }
+
+        self.aiSkirmish = ko.observable().extend({ session: 'ai_skirmish' });
+        self.pushAIButton = ko.observable(self.aiSkirmish());
+
+        self.tagOptions = ko.observableArray(['Casual', 'Competitive', 'AI Battle', 'Testing']);
+        self.tagLock = ko.observable(false);
+        self.tag = ko.observable(self.tagOptions()[0]).extend({ session: 'lobby_tag' });
+        self.tag.subscribe(function (value) {
+            if (self.tagLock())
+                return;
+            self.changeSettings();
+        });
+
+        self.isPublicGame = ko.observable(false);
+        self.setPublicGame = function () {
+            self.isFriendsOnlyGame(false);
+            self.isPublicGame(true);
+            self.changeSettings();
+        }
+        self.isHiddenGame = ko.computed(function() { return !self.isFriendsOnlyGame() && !self.isPublicGame(); });
+        self.setHiddenGame = function() {
+            self.isFriendsOnlyGame(false);
+            self.isPublicGame(false);
+            self.changeSettings();
+        };
+
+// preserve password on refresh or when connecting to password protected custom servers
+        self.privateGamePassword = ko.observable().extend({ session: 'private_game_password', rateLimit: { timeout: 1000, method: "notifyWhenChangesStop" } });
+
+        self.privateGamePassword.subscribe(self.changeBouncer);
+
+        self.friends = ko.observableArray([]).extend({ session: 'friends' });
+        self.hasFriends = ko.computed(function () { return self.friends().length });
+
+        self.invites = ko.observableArray([]).extend({ session: 'invites' });
+        self.hasInvites = ko.computed(function () { return self.invites().length });
+
+        self.lobbyContacts = ko.observableArray([]);
+        self.lobbyContacts.subscribe(function (value) {
+            //api.debug.log('lobby contacts');
+            api.Panel.message('uberbar', 'lobby_contacts', value);
+        });
+        self.lobbyContactsMap = ko.computed(function () {
+            result = {};
+            _.forEach(self.lobbyContacts(), function (element) {
+                result[element] = true;
+            });
+            return result;
+        });
+
+        self.whitelist = ko.computed(function () {
+            if (self.isFriendsOnlyGame())
+                return self.friends();
+            return [];
+        });
+        self.whitelist.subscribe(self.changeBouncer);
+
+        self.blocked = ko.observableArray([]).extend({ session: 'blocked' });
+        self.blocked.subscribe(self.changeBouncer);
+
+        self.createdGameId = ko.observable();
+
+        self.uberNetRegion = ko.observable().extend({ local: 'uber_net_region' });
+
+        self.transitPrimaryMessage = ko.observable().extend({ session: 'transit_primary_message' });
+        self.transitSecondaryMessage = ko.observable().extend({ session: 'transit_secondary_message' });
+        self.transitDestination = ko.observable().extend({ session: 'transit_destination' });
+        self.transitDelay = ko.observable().extend({ session: 'transit_delay' });
+
+        self.waitingString = ko.observable('');
+
+        self.listenToSpectators = ko.observable(false);
+        self.landAnywhere = ko.observable(false);
+
+        self.notLandAnywhere = ko.pureComputed(function()
+        {
+            return !self.landAnywhere();
+        });
+
+        self.toggleLandAnywhere = function()
+        {
+            if (self.canChangeSettings())
+            {
+                self.landAnywhere(!self.landAnywhere());
+                self.changeSettings();
+            }
+        };
+        self.dynamicAlliances = ko.observable(false);
+        self.dynamicAllianceVictory = ko.observable(false);
+
+        self.toggleDynamicAlliances = function() {
+            if (self.canChangeSettings())
+                self.dynamicAlliances(!self.dynamicAlliances());
+            self.changeSettings();
+        }
+
+         self.toggleDynamicAllianceVictory = function() {
+             if (self.canChangeDynamicAllianceVictory())
+                self.dynamicAllianceVictory(!self.dynamicAllianceVictory());
+            self.changeSettings();
+        }
+
+        self.eradicationMode = ko.observable(false);
+        self.eradicationModeSubCommanders = ko.observable(false);
+        self.eradicationModeFactories = ko.observable(false);
+        self.eradicationModeFabricators = ko.observable(false);
+
+        self.toggleeradicationMode = function() {
+            if (self.canChangeSettings())
+                self.eradicationMode(!self.eradicationMode());
+            self.changeSettings();
+        }
+
+        self.toggleeradicationModeSubCommanders = function() {
+            if (self.canChangeeradicationMode())
+                self.eradicationModeSubCommanders(!self.eradicationModeSubCommanders());
+            self.changeSettings();
+        }
+
+        self.toggleeradicationModeFactories = function() {
+            if (self.canChangeeradicationMode())
+                self.eradicationModeFactories(!self.eradicationModeFactories());
+            self.changeSettings();
+        }
+
+        self.toggleeradicationModeFabricators = function() {
+            if (self.canChangeeradicationMode())
+                self.eradicationModeFabricators(!self.eradicationModeFabricators());
+            self.changeSettings();
+        }
+
+
+        self.bountyMode = ko.observable(false);
+        self.bountyModeLock = ko.observable(false);
+
+        self.bountyModeChanged = self.bountyMode.subscribe(function()
+        {
+            if (self.bountyModeLock())
+                return;
+
+            self.updateSettings();
+        });
+
+        self.bountyValueLock = false;
+        self.bountyValue = ko.observable(0.2);
+        self.bountyValueInput = ko.observable(0.2).extend({ rateLimit: { timeout: 750, method: "notifyWhenChangesStop" } });
+        self.bountyValueInput.subscribe(function(value) {
+            self.bountyValueInput(Math.max(0.01, Math.min(10.0, Number(Number(value).toFixed(2)))));
+            self.bountyValue(self.bountyValueInput());
+        });
+        self.bountyValue.subscribe(function(v) {
+            self.bountyValueInput(v);
+            if (!self.bountyValueLock)
+                self.updateSettings();
+        });
+
+        self.toggleBountyMode= function () {
+            if (self.canChangeSettings())
+                self.bountyMode(!self.bountyMode());
+            self.changeSettings();
+        }
+
+        self.suddenDeathMode = ko.observable(false);
+
+        self.toggleSuddenDeathMode = function () {
+            if (self.canChangeSettings())
+                self.suddenDeathMode(!self.suddenDeathMode());
+            self.changeSettings();
+        }
+
+        self.shuffleLandingZones = ko.observable(true);
+
+        self.toggleShuffleLandingZones = function()
+        {
+            if (self.canChangeShuffleLandingZones())
+                self.shuffleLandingZones(!self.shuffleLandingZones());
+            self.changeSettings();
+        }
+
+        self.sandbox = ko.observable(false);
+
+        self.toggleSandbox = function () {
+            if (self.canChangeSettings())
+                self.sandbox(!self.sandbox());
+            self.changeSettings();
+        }
+
+        self.requiredContent = ko.observable();
+        self.isTitansGame = ko.pureComputed(function() {
+            return _.contains(self.requiredContent(), 'PAExpansion1');
+        });
+
+        self.allowResetArmiesOnChange = ko.observable(false);
+
+        self.gameType.subscribe(function (value) {
+            if (self.allowResetArmiesOnChange()) {
+                self.resetArmies();
+                self.updateSettings();
+            }
+        });
+
+
+        self.armies = ko.observableArray([]);
+
+        self.nextSceneUrl = ko.observable().extend({ session: 'next_scene_url' });
+
+        self.isGameCreator = ko.observable(false);
+
+        self.updateSettings = function () {
+            self.changeSettings();
+            return true; //required to allow the ko checked binding to update when also bound with ko clicked binding
+        }
+
+        /* Can the player change settings? True if they're the creator. */
+        self.canChangeSettings = ko.computed(function () {
+            return self.isGameCreator();
+        });
+        self.canNotChangeSettings = ko.computed(function () {
+            return !self.canChangeSettings();
+        });
+        /* Can the player change a setting that we allow to be changed during a ladder match? */
+        self.canChangeLadderMutableSettings = ko.computed(function() {
+            return self.isGameCreator();
+        });
+        self.canChangeDynamicAllianceVictory = ko.computed(function () {
+            return self.canChangeSettings() && self.dynamicAlliances();
+        });
+
+        self.canChangeeradicationMode = ko.computed(function () {
+            return self.canChangeSettings() && self.eradicationMode();
+        });
+
+        self.canChangeShuffleLandingZones = ko.computed(function()
+        {
+            return self.canChangeSettings() && !self.landAnywhere();
+        });
+
+        var customTypes = { custom: true, local: true };
+        var isLocalOrCustomGame = (self.isLocalGame() || self.serverType() in customTypes);
+
+        self.isGameCreator.subscribe(function (value) {
+            if (value && self.devMode()) {
+                self.sandbox(true);
+                self.changeSettings();
+            }
+
+            if (isLocalOrCustomGame && value && !self.aiSkirmish())
+                setTimeout(self.requestUPNPStatus, 1000);
+        });
+
+        if (isLocalOrCustomGame)
+        {
+            var ackTimeoutMs = 30000;
+            console.log('Client will check server availability every ' +
+                (ackTimeoutMs / 1000) + ' seconds.');
+
+            self.sendACK = setInterval(function () {
+                model.send_message("ack", {});
+            }, ackTimeoutMs);
+        }
+
+        self.slots = ko.computed(function () {
+            var slots = 0;
+            var i;
+
+            for (i = 0; i < self.armies().length; i++)
+                slots += self.armies()[i].numberOfSlots();
+            return slots;
+        });
+
+        self.playerSlots = ko.computed(function () {
+            var slots = 0;
+            var i;
+
+            for (i = 0; i < self.armies().length; i++)
+                if (!self.armies()[i].aiArmy())
+                    slots += self.armies()[i].numberOfSlots();
+
+            return slots;
+        });
+        self.numberOfEmptySlots = ko.computed(function () {
+            var slots = 0;
+            var i;
+
+            for (i = 0; i < self.armies().length; i++)
+                slots += self.armies()[i].numberOfEmptySlots();
+
+            return slots;
+        });
+        self.numberOfEmptySlots.subscribe(function (value) {
+            api.Panel.message('uberbar', 'lobby_empty_slots', { slots: value });
+        });
+
+        self.playerCount = ko.computed(function () {
+            return self.playerSlots();
+        });
+
+        self.maxSpectatorsLimit = ko.observable(3);
+        self.maxPlayersLimit = ko.observable(12);
+
+        self.spectatorLimitOptions = ko.computed(function () {
+            return _.range(self.maxSpectatorsLimit()+1);
+        });
+
+        self.gameName = ko.observable().extend({ maxLength: 128, rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
+        self.gameNameLock = ko.observable(false);
+        self.gameName.subscribe(function (value) {
+            if (self.gameNameLock())
+                return;
+            self.changeSettings();
+        });
+
+        self.gameModeString = ko.computed(function () {
+            return self.gameType() + self.playerCount();
+        });
+
+        self.armyDescription = function(number)
+        {
+            if (self.isTeamGame())
+                return loc('!LOC:Team __team_number__', { team_number: number });
+            else
+                return loc('!LOC:Slot __slot_number__', { slot_number: number });
+        };
+
+        self.addTeamLabel = ko.pureComputed(function() {
+            if (self.isTeamGame())
+                return loc('!LOC:Add Team');
+            else
+                return loc('!LOC:Add Slot');
+        });
+
+        self.teamDescription = ko.computed(function () {
+            if (self.isTeamGame())
+                return loc('!LOC:Team');
+            else
+                return loc('!LOC:Slot');
+        });
+
+        self.system = ko.observable({});
+        self.systemIsEmpty = ko.computed(function () {
+            return !self.system() || _.isEmpty(self.system()) || !self.system().planets.length;
+        });
+
+        self.serverReady = ko.observable(false);
+        self.serverLoading = ko.computed(function()
+        {
+            return !self.systemIsEmpty() && !self.serverReady();
+        });
+
+        /** @deprecated */
+        self.clientHasLoadedOnce = ko.observable(false);
+
+        self.clientLoading = ko.observable(false);
+        self.clientLoading.subscribe(function(loading)
+        {
+            self.send_message('set_loading', { loading: loading });
+            if (!loading)
+                self.clientHasLoadedOnce(true);
+        });
+
+        self.serverModsState = ko.observable(undefined);
+
+        self.serverModsStatus = ko.computed(function() {
+
+            var status = '';
+
+            switch(self.serverModsState()) {
+
+                case 'uploading':
+                    status = 'Uploading server mods...';
+                    break;
+                case 'downloading':
+                    status = 'Downloading server mods...';
+                    break;
+                case 'mounting':
+                    status = 'Mounting server mods...';
+                    break;
+                case 'mounted':
+                    break;
+                default:
+            }
+            api.debug.log(status);
+            return loc(status);
+        });
+
+        self.slotsAreEmptyInfo = ko.observable('');
+        self.slotsAreEmpty = ko.computed(function() {
+            var result = _.some(self.armies(), function(army) {
+                if (army.aiArmy())
+                    return false;
+                return _.some(army.slots(), function(slot) {
+                    return slot.isEmpty();
+                });
+            })
+            if (result)
+                self.slotsAreEmptyInfo(loc("!LOC:Slots are empty"));
+            else
+                self.slotsAreEmptyInfo('');
+            return result;
+        });
+
+        self.friendsAreMissingInfo = ko.observable('');
+        self.friendsAreMissing = ko.computed(function () {
+            var result = self.isFriendsOnlyGame() && !self.friends().length;
+            if (result)
+                self.friendsAreMissingInfo(loc("!LOC:You must have friends to play a friends-only game"));
+            else
+                self.friendsAreMissingInfo('');
+            return result;
+        });
+
+        self.holdReadyMap = ko.observable({/* identifier: info */});
+
+        self.registerHoldReady = function(identifier, info) {
+            self.holdReadyMap()[identifier] = info;
+            self.holdReadyMap.valueHasMutated();
+        }
+
+        self.unregisterHoldReady = function(identifier) {
+            delete self.holdReadyMap()[identifier];
+            self.holdReadyMap.valueHasMutated();
+        }
+
+        self.holdReadyInfo = ko.computed(function() {
+            return _.last(_.values(self.holdReadyMap())) || '';
+        });
+
+        self.holdReady = ko.computed(function() {
+            var hold = _.size(self.holdReadyMap()) > 0;
+
+            if (hold && self.thisPlayerIsReady()) {
+                self.send_message('toggle_ready');
+            }
+
+            return hold;
+        });
+
+        self.loadedSystem = ko.observable({}).extend({ session: 'loaded_system' });
+        self.loadedSystemIsEmpty = ko.computed(function () { return _.isEmpty(self.loadedSystem()); });
+
+        self.gameSystemReadyInfo = ko.observable('');
+        self.gameSystemReady = ko.computed(function()
+        {
+            var info = self.holdReadyInfo();
+            if (!info && (self.clientLoading() || !self.serverReady()))
+            {
+                info = loc(self.systemIsEmpty() ? '!LOC:Waiting for system' : '!LOC:Building planets');
+
+            }
+
+            self.gameSystemReadyInfo(info);
+            return !info;
+        });
+
+        self.gameIsNotOkInfo = ko.computed(function() {
+            if (self.isGameCreator()) {
+                return self.serverModsStatus() || self.friendsAreMissingInfo() || self.slotsAreEmptyInfo() || self.gameSystemReadyInfo();
+            } else {
+                return self.gameSystemReadyInfo();
+            }
+        });
+        self.gameIsNotOk = ko.computed(function () { return self.friendsAreMissing() || self.slotsAreEmpty() || !self.gameSystemReady(); });
+
+        self.startEnabled = ko.computed(function() {
+            return self.allPlayersAreReady() && !self.serverLoading() && !self.clientLoading() && !self.gameIsNotOk();
+        });
+
+        self.startEnabled.subscribe(function (value)
+        {
+            if (value)
+            {
+                api.audio.playSound('/SE/UI/UI_lobby_game_loaded');
+            }
+        });
+
+        self.canAddMorePlayers = ko.computed(function() {
+           return self.playerCount() < self.maxPlayersLimit()
+        });
+
+        self.showAddSlot = ko.computed(function () {
+            if (!self.isGameCreator())
+                return false;
+
+            if (self.isFFAGame())
+                return false
+
+            return self.canAddMorePlayers();
+        });
+
+        self.showAddArmy = ko.computed(function () {
+            return self.canAddMorePlayers();
+        });
+
+        self.hideAddArmy = ko.computed(function () {
+            return !self.showAddArmy();
+        });
+
+        self.addArmy = function () {
+            if (!self.showAddArmy())
+                return;
+
+            self.send_message('add_army', {
+                options: {
+                    slots: 1,
+                    ai: false,
+                    alliance: self.isTeamGame()
+                }
+            });
+        };
+
+        self.showRemoveArmy = ko.computed(function () {
+            return self.armies().length > 2 && self.isGameCreator();
+        });
+        self.removeArmy = function (army_index) {
+            self.send_message('remove_army', { 'army_index': army_index } );
+        };
+
+        self.resetArmies = function () {
+
+            if (!self.isGameCreator())
+                return;
+
+            if (self.isFFAGame()) {
+                self.send_message('reset_armies', [
+                    { slots: 1, ai: false, alliance: false },
+                    { slots: 1, ai: false, alliance: false }
+                ]);
+            }
+            else {
+                self.send_message('reset_armies', [
+                   { slots: 2, ai: false, alliance: true },
+                   { slots: 2, ai: false, alliance: true }
+                ]);
+            }
+
+            // if (self.loadedSystemIsEmpty() && !model.updateSystemInProgress())
+            //     self.loadRandomSystem();
+        };
+
+        self.newGameWhenLoaded = ko.observable(false).extend({ session: 'new_game_when_loaded' });
+
+        self.navToEditPlanet = function () {
+            self.lastSceneUrl('coui://ui/main/game/new_game/new_game.html?returnFromLoad=true');
+            self.nextSceneUrl(self.lastSceneUrl());
+
+            window.location.href = 'coui://ui/main/game/load_planet/load_planet.html?tabs=false&systems=true&planets=false&title=' + encodeURI('!LOC:Select System');
+            return; /* window.location.href will not stop execution. */
+        }
+
+        self.choosePremadeSystem = function (index) {
+            self.showSystemPicker(false);
+            self.system(_.cloneDeep(self.defaultSystems()[index]));
+            console.log(self.defaultSystems()[index])
+            self.updateSystem(self.system());
+            self.changeSettings();
+            self.requestUpdateCheatConfig();
+        };
+
+        self.chooseRecentSystem = function (index) {
+            self.showSystemPicker(false);
+            self.system(_.cloneDeep(self.recentSystems()[index]));
+            self.updateSystem(self.system());
+            self.changeSettings();
+            self.requestUpdateCheatConfig();
+        };
+
+        self.updateSystemInProgress = ko.observable(false);
+
+        self.updateSystem = function (system)
+        {
+            if (_.isEmpty(system))
+                return;
+
+            self.clientLoading(true);
+            self.serverReady(false);
+
+            self.send_message('modify_system', UberUtility.fixupPlanetConfig(system), function (success, reason)
+            {
+                if (success)
+                {
+                    self.updateSystemInProgress(true);
+                }
+                else
+                {
+                    self.chatMessages.push(new ChatMessageViewModel('server', 'server', 'Loading system failed: ' + reason));
+                    // self.chatMessages.push(new ChatMessageViewModel('server', 'server', 'Generating random system'));
+                    self.setupWhenPlanetsAreReady();
+                }
+            });
+        }
+
+        self.assignRandomAI = function () {
+            var filterValidPersonalities = function (personalityNames) {
+              return _.filter(personalityNames, function (name) {
+                return !_.startsWith(name, "Idle") && !_.includes(name, "Random");
+              });
+            };
+
+            _.forEach(model.armies(), function (army) {
+              _.forEach(army.slots(), function (slot) {
+                if (slot.ai() === true && slot.aiPersonality() === "Random") {
+                  var availablePersonalities = filterValidPersonalities(
+                    self.aiPersonalityNames()
+                  );
+                  var chosenPersonality = _.sample(availablePersonalities);
+                  slot.aiPersonality(chosenPersonality);
+                }
+              });
+            });
+          };
+
+        /* signal server to start building planets and start the game */
+        self.startGame = function () {
+            if (!self.startEnabled())
+                return;
+
+            if (self.gameIsNotOk())
+                return;
+
+            if (!self.allPlayersAreReady())
+                return;
+
+            // update invite if spectator slots available otherise reset to cancel invites
+            if (self.emptySpectatorSlots() > 0) {
+                self.sendLobbyStatus(loc('!LOC:Started') + ' ' + self.lobbyFormat());
+            }
+            else {
+                self.resetLobbyInfo();
+            }
+
+            self.assignRandomAI()
+
+            api.audio.playSound('/SE/UI/UI_lobby_start_button');
+
+            if (self.gwTechCardSlotCount() <= 0) {
+                self.gwTechCardsActiveSession(false);
+                self.send_message('start_game', {
+                    countdown: 5
+                });
+                return;
+            }
+
+            if (self.gwTechLaunchInProgress()) {
+                return;
+            }
+
+            self.gwTechLaunchInProgress(true);
+            self.gwTechConfigMounted(false);
+            self.gwTechConfigMountInProgress = false;
+
+            self.cookGwTechConfig().then(function(config) {
+                self.send_message('set_gw_tech_config', config, function(success, response) {
+                    if (!success) {
+                        console.error('[GW TECH] set_gw_tech_config failed: ' + JSON.stringify(response || {}));
+                        self.gwTechLaunchInProgress(false);
+                        return;
+                    }
+
+                    self.send_message('start_game', {
+                        countdown: 5
+                    }, function(startSuccess, startResponse) {
+                        if (!startSuccess) {
+                            console.error('[GW TECH] start_game failed: ' + JSON.stringify(startResponse || {}));
+                            self.gwTechLaunchInProgress(false);
+                        }
+                    });
+                });
+            }, function(reason) {
+                console.error('[GW TECH] Failed to cook tech-card config: ' + JSON.stringify(reason));
+                self.gwTechLaunchInProgress(false);
+            });
+        };
+
+        self.toggleReady = function () {
+            if (self.holdReady()) {
+                return;
+            }
+            if (!self.showStartingGameCountdown()) {
+                // Toggle predictively so we can recognize deliberate unready
+                self.thisPlayerIsReady(!self.thisPlayerIsReady());
+
+                self.send_message('toggle_ready');
+            }
+        };
+
+        self.aiPersonalities = ko.observable( ai_types() ); /* from js/ai.js */
+
+        self.aiPersonalityNames = ko.computed(function() {
+            return _.keys(self.aiPersonalities());
+        });
+
+        self.previousAIPersonality = ko.observable('Normal').extend({ local: 'previousAIPersonality' });
+        self.getAIPersonalityDescription = function(name) {
+            return loc(_.get(self.aiPersonalities(), [name, 'display_name']));
+        };
+
+        self.aiLandingPolicyOptions = ko.observableArray(['no_restriction', 'on_player_planet', 'off_player_planet']);
+        self.aiLandingPolicyDescriptions = ko.observable({
+            'no_restriction': '!LOC:Start Anywhere',
+            'on_player_planet': '!LOC:Start Nearby',
+            'off_player_planet': '!LOC:Start Offworld'
+        });
+        self.getAILandingPolicyDescription = function (value) {
+            return loc(self.aiLandingPolicyDescriptions()[value]);
+        };
+
+        self.previousAILandingPolicy = ko.observable(self.aiLandingPolicyOptions()[0]).extend({ local: 'previousAILandingPolicy' });
+
+        self.targetAIArmyIndex = ko.observable();
+        self.targetAISlotIndex = ko.observable();
+
+        self.addAI = function (index) {
+            var personality = self.aiPersonalities()[self.previousAIPersonality()];
+api.debug.log(personality);
+            model.send_message('add_ai', {
+                army_index: self.targetAIArmyIndex(),
+                slot_index: self.targetAISlotIndex(),
+                options: { 'ai': true, 'personality': personality, 'landing_policy': self.previousAILandingPolicy() }
+            });
+        }
+
+        self.systemHasMultiPlanetSpawns = ko.computed(function () {
+            var system = self.system();
+
+            var count = _.filter(system.planets, function (element) {
+                if(element.starting_planet){return 1}
+                if(element.planet !== undefined){if(element.planet.landingZonesPerArmy > 0){return 1};}
+                return 0;
+            });
+
+            return count.length > 1;
+        });
+
+        self.processSystemPlayersText = function (players) {
+            if (!players)
+                return '';
+            var minPlayers = Math.max(players[0], 2);
+            var maxPlayers = Math.max(players[1], 2);
+            return (minPlayers !== maxPlayers) ? minPlayers + '-' + maxPlayers : minPlayers;
+        };
+
+        self.processSystemPlayersCSS =  function (players) {
+            var slotCount = self.slots();
+
+            if (!players)
+                return 'valid';
+
+            var ok =
+                (!_.isFinite(players[0]) || slotCount >= players[0]) &&
+                (!_.isFinite(players[1]) || slotCount <= players[1]);
+            return ok ? 'valid' : 'invalid';
+        };
+
+        self.systemPlayerText = ko.computed(function() {
+            var players = self.system().players;
+            if (!players)
+                return '';
+            var minPlayers = Math.max(players[0], 2);
+            var maxPlayers = Math.max(players[1], 2);
+            return (minPlayers !== maxPlayers) ? minPlayers + '-' + maxPlayers : minPlayers;
+        });
+
+        self.systemPlayersCSS = ko.computed(function() {
+
+            return self.processSystemPlayersCSS(self.system().players);
+
+            var systemPlayers = (self.system().players || []);
+            var slotCount = self.slots();
+            var ok =
+                (!_.isFinite(systemPlayers[0]) || slotCount >= systemPlayers[0]) &&
+                (!_.isFinite(systemPlayers[1]) || slotCount <= systemPlayers[1]);
+            return ok ? 'valid' : 'invalid';
+        });
+
+        self.planetTooltip = function(planet) {
+
+            if (!planet) {
+                return '';
+            }
+
+            var tooltip = '';
+            var planetSpec = planet.planet;
+
+            if (planetSpec) {
+
+                if (planetSpec.radius) {
+                    tooltip = tooltip + 'Radius: ' + planetSpec.radius + '<br />';
+                }
+
+                if (planetSpec.biome != 'gas') {
+
+                    if (planet.metal_spots_count) {
+                        tooltip = tooltip + 'Custom Metal: ' + planet.metal_spots_count + '<br />';
+                    } else {
+                        tooltip = tooltip + 'Metal Clusters: ' + Math.round(planetSpec.metalClusters) + '<br />' + 'Metal Density: ' + Math.round(planetSpec.metalDensity) + '<br />';
+                    }
+
+                    if (planet.planetCSG_count) {
+                        tooltip = tooltip + 'Custom CSG: ' + planet.planetCSG_count + '<br />';
+                    }
+
+                    if (planet.landing_zones_count) {
+                        tooltip = tooltip + 'Custom Landing: ' + planet.landing_zones_count + '<br />';
+                    }
+                }
+            }
+
+            return tooltip;
+        }
+
+        self.processPlanet = function(planet) {
+
+            if (!planet) {
+                return null;
+            }
+
+           var tooltip = self.planetTooltip(planet);
+
+            var result = {
+                biome: planet.planet && planet.planet.biome || '',
+                start: planet.starting_planet,
+                move_thrust: planet.required_thrust_to_move,
+                tooltip: tooltip
+            };
+            if(planet.generator){result.biome = planet.generator.biome}
+            return result;
+        }
+
+        self.processSystem = function (system) {
+
+            if (_.isEmpty(system))
+                return null;
+
+            var planets = _.map(system.planets, self.processPlanet);
+
+            var result = {
+                name: system.name,
+                planets: planets,
+                playersText: self.processSystemPlayersText(system.players),
+                playersCSS: self.processSystemPlayersCSS(system.players)
+            };
+            return result;
+        };
+
+        self.processRecentSystem = function (system) {
+
+            if (_.isEmpty(system))
+                return null;
+
+            var planets = _.map(system.planets, self.processPlanet);
+
+            var result = {
+                name: system.name,
+                planets: planets,
+                playersText: self.processSystemPlayersText(system.players),
+                playersCSS: self.processSystemPlayersCSS(system.players)
+            };
+
+            return result;
+        };
+
+
+        self.recentSystems = ko.observableArray([]);
+
+        self.updateRecentSystems = ko.computed(function(){
+            if(!self.isGameCreator()){return}
+            if(localStorage.recentSystems == undefined){localStorage.recentSystems = '{"systems":[]}'}
+            try{
+                self.recentSystems(JSON.parse(localStorage.recentSystems).systems)
+            }
+            catch(error){
+                self.recentSystems([])
+                localStorage.recentSystems = '{"systems":[]}'
+            }
+            var recentSystems = self.recentSystems()
+            var currentSystem = _.cloneDeep(self.system())
+            var newSystem = true;
+            if(!_.isEmpty(currentSystem.planets)){
+                _.map(recentSystems, function(system){
+                    if(system.name == currentSystem.name){newSystem = false}
+                })
+
+                if(newSystem == true){
+                    if(recentSystems.length == 5){
+                        recentSystems.pop()
+                        recentSystems.unshift(currentSystem)
+                    }
+                    else{recentSystems.unshift(currentSystem)}
+                    self.recentSystems(recentSystems)
+                    localStorage.recentSystems = JSON.stringify({"systems":recentSystems})
+                }
+            }
+        })
+
+        self.processedRecentSystems =  ko.computed(function()
+        {
+            return _.map(self.recentSystems(), self.processRecentSystem);
+        });
+
+        self.premadeSystems = ko.observableArray([]).extend({memory: 'default_systems'});
+
+        self.preferredDefaultSystemNames = ko.observable(
+        {
+            'Disparity': true,
+            'Maginot': true,
+            'Lock': false,
+            'Clutch': false,
+            'Crag': false,
+            'Bedlam': false,
+            'Pax': false,
+            "Ember Fields": true,
+            "Marshall's Artifice": true,
+            'Spindel Range': true,
+        });
+
+        self.defaultSystems = ko.computed(function()
+        {
+
+            var list = _.filter(self.premadeSystems(), function (element)
+            {
+                return !!self.preferredDefaultSystemNames()[element.name];
+            });
+
+            return list;
+        });
+
+        self.firstPickRandomSystems = ko.computed(function()
+        {
+
+            var exclude = {
+                'Pax': true
+            };
+
+            var list = _.reject(self.defaultSystems(), function(element)
+            {
+                return exclude[element.name];
+            });
+
+            return list;
+        });
+
+        self.processedDefaultSystems = ko.computed(function()
+        {
+            return _.map(self.defaultSystems(), self.processSystem);
+        });
+        self.processedSelectedSystem = ko.computed(function()
+        {
+            // hide any planet tooltips to prevent ghosting
+            $('div.section_content > div.tooltip').tooltip('hide');
+            return self.processSystem(self.system());
+        });
+
+        function SystemGenerator(model)
+        {
+            var self = this;
+
+            self.symmetricalOption = ko.observable(true);
+            self.largeOption = ko.observable(false);
+            self.asteroid = ko.observable(false);
+            self.mulitpleStartingPlanets = ko.observable(false);
+
+            self.templates = {
+                arena: [
+                    {
+                        mass: 30000,
+                        planet: [
+                            { type: 'temperate_start', size: [0, 2] },
+                            { type: 'desert_start', size: [0, 2] },
+                            { type: 'ice_start', size: [0, 2] },
+                            { type: 'lava_start', size: [0, 1] },
+                            { type: 'tropical_start', size: [0, 1]}
+                        ],
+                        position_x: 25000,
+                        position_y: 0,
+                        required_thrust_to_move: 0,
+                        starting_planet: true,
+                        velocity_x: 0,
+                        velocity_y: 140
+                    }
+                ],
+                moon_race: [
+                    {
+                        mass: 30000,
+                        planet: [
+                           { type: 'temperate_start', size: [0, 2] },
+                            { type: 'desert_start', size: [0, 2] },
+                            { type: 'ice_start', size: [0, 2] },
+                            { type: 'lava_start', size: [0, 1] },
+                            { type: 'tropical_start', size: [0, 1]}
+                        ],
+                        position_x: 25000,
+                        position_y: 0,
+                        required_thrust_to_move: 0,
+                        starting_planet: true,
+                        velocity_x: 0,
+                        velocity_y: 140
+                    },
+                    {
+                        mass: 5000,
+                        planet: [
+                            { type: 'normal_moon', size: [0, 1] },
+                            { type: 'lava_moon', size: [0, 1] },
+                            { type: 'weird_moon', size: [0, 1] }
+                        ],
+                        position_x: 28000,
+                        position_y: 0,
+                        required_thrust_to_move: [1,3],
+                        starting_planet: false,
+                        velocity_x: 0,
+                        velocity_y: 30
+                    }
+                ],
+                harvest: [
+                    {
+                        mass: 30000,
+                        starting_planet: true,
+                        required_thrust_to_move: 0,
+                        position_x: 32400,
+                        position_y: 0,
+                        velocity_x: 0,
+                        velocity_y: -40,
+                        planet: [
+                            { type: 'temperate_start', size: [0, 2] },
+                            { type: 'desert_start', size: [0, 2] },
+                            { type: 'ice_start', size: [0, 2] },
+                            { type: 'lava_start', size: [0, 1] },
+                            { type: 'tropical_start', size: [0, 1]}
+                        ],
+                    },
+                    {
+                        mass: 5000,
+                        starting_planet: false,
+                        required_thrust_to_move: [1, 3],
+                        position_x: 14000,
+                        position_y: 0,
+                        velocity_x: 0,
+                        velocity_y: -180,
+                        planet: [
+                            { type: 'normal_moon', size: [0, 1] },
+                            { type: 'lava_moon', size: [0, 1] },
+                            { type: 'weird_moon', size: [0, 1] }
+                        ],
+                    },
+                    {
+                        mass: 50000,
+                        starting_planet: false,
+                        required_thrust_to_move: 0,
+                        position_x: 28200,
+                        position_y: 0,
+                        velocity_x: 0,
+                        velocity_y: 130,
+                        planet: { type: 'gas', size: 0 }
+                    }
+                ],
+                metal: [
+                     {
+                         mass: 30000,
+                         planet: { type: 'metal_start', size: 0 },
+                         position_x: 25000,
+                         position_y: 0,
+                         required_thrust_to_move: 0,
+                         starting_planet: true,
+                         velocity_x: 0,
+                         velocity_y: 140
+                    },
+                    {
+                        mass: 5000,
+                        planet: [
+                            { type: 'temperate_start', size: 0 },
+                            { type: 'desert_start', size: 0 },
+                            { type: 'ice_start', size: 0 },
+                            { type: 'lava_start', size: 0 },
+                            { type: 'tropical_start', size: 0 }
+                        ],
+                        position_x: 28000,
+                        position_y: 0,
+                        required_thrust_to_move: 0,
+                        starting_planet: false,
+                        velocity_x: 0,
+                        velocity_y: 140
+                    },
+                ],
+                space: [
+                    {
+                        mass: 30000,
+                        starting_planet: true,
+                        required_thrust_to_move: 0,
+                        position_x: 25400,
+                        position_y: 0,
+                        velocity_x: 0,
+                        velocity_y: 140,
+                        planet: [
+                            { type: 'temperate_start', size: [0, 2] },
+                            { type: 'desert_start', size: [0, 2] },
+                            { type: 'ice_start', size: [0, 2] },
+                            { type: 'lava_start', size: [0, 1] },
+                            { type: 'tropical_start', size: [0, 1]}
+                        ]
+                    },
+                    {
+                        mass: 5000,
+                        starting_planet: false,
+                        required_thrust_to_move: [1, 3],
+                        position_x: 28000,
+                        position_y: 0,
+                        velocity_x: 0,
+                        velocity_y: 40,
+                        planet: [
+                            { type: 'normal_moon', size: [0, 1] },
+                            { type: 'lava_moon', size: [0, 1] },
+                            { type: 'weird_moon', size: [0, 1] }
+                        ],
+                    },
+                    {
+                        mass: 5000,
+                        starting_planet: false,
+                        required_thrust_to_move: [1, 3],
+                        position_x: 29800,
+                        position_y: 0,
+                        velocity_x: 0,
+                        velocity_y: -10,
+                        planet: [
+                            { type: 'normal_moon', size: [0, 1] },
+                            { type: 'lava_moon', size: [0, 1] },
+                            { type: 'weird_moon', size: [0, 1] }
+                        ],
+                    },
+                    {
+                        mass: 5000,
+                        starting_planet: false,
+                        required_thrust_to_move: [1, 3],
+                        position_x: 40200,
+                        position_y: 0,
+                        velocity_x: 0,
+                        velocity_y: 110,
+                        planet: [
+                            { type: 'normal_moon', size: [0, 1] },
+                            { type: 'lava_moon', size: [0, 1] },
+                            { type: 'weird_moon', size: [0, 1] }
+                        ],
+                    }
+                ]
+            };
+
+            self.templateNames = ko.observable(_.keys(self.templates));
+
+            var MIN_RADIUS_SMALL = 250;
+            var MAX_RADIUS_SMALL = 350;
+            var MIN_RADIUS_LARGE = 400;
+            var MAX_RADIUS_LARGE = 800;
+
+            var MIN_METAL_CLUSTERS = 0;
+            var MIN_METAL_DENSITY = 30;
+
+            var LOW_METAL_CLUSTERS = 0;
+            var LOW_METAL_DENSITY = 45;
+
+            var AVG_METAL_CLUSTERS = 50;
+            var AVG_METAL_DENSITY = 50;
+
+            var MAX_METAL_CLUSTERS = 65;
+            var MAX_METAL_DENSITY = 70;
+
+            var MIN_RANDOM_SEED = 1;
+            var MAX_RANDOM_SEED = 4294967295;
+
+            var generateRandomSeed = function () {
+                var min = MIN_RANDOM_SEED,
+                    max = MAX_RANDOM_SEED;
+                return Math.floor(Math.random() * (max - min)) + min;
+            };
+
+            self.asteroidLocations = [[0, 60000, -100, 0], [0, -60000, 100, 0], [60000, 0, 0, 100], [-60000, 0, 0, -100]];
+
+            self.asteroidTemplate =
+            {
+                name: "asteroid belt",
+                mass: 5000,
+                required_thrust_to_move: 1,
+                planet:
+                {
+                    seed: 8239,
+                    radius: 250,
+                    heightRange: 100,
+                    waterHeight: 0,
+                    waterDepth: 100,
+                    temperature: 50,
+                    metalDensity: 1,
+                    metalClusters: 1,
+                    metalSpotLimit: 5,
+                    biome: 'asteroid',
+                    biomeScale: 100
+                }
+            };
+
+            self.planets = {
+                temperate_start: [
+                    { /* small temperate */
+                        biome: 'earth',
+                        biomeScale: 50,
+                        heightRange: [10, 30],
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [MIN_RADIUS_LARGE, 550],
+                        seed: generateRandomSeed(),
+                        temperature: [60, 100],
+                        waterHeight: [35, 45],
+                        waterDepth: 100,
+                    },
+                    { /* med temperate */
+                         biome: 'earth',
+                         biomeScale: 50,
+                         heightRange: [10, 30],
+                         metalClusters: AVG_METAL_CLUSTERS,
+                         metalDensity: AVG_METAL_DENSITY,
+                         radius: [500, 650],
+                         seed: generateRandomSeed(),
+                         temperature: [35, 40],
+                         waterHeight: [35, 45],
+                         waterDepth: 100,
+                    },
+                    { /* naval temperate */
+                         biome: 'earth',
+                         biomeScale: 50,
+                         heightRange: [20, 40],
+                         metalClusters: AVG_METAL_CLUSTERS,
+                         metalDensity: AVG_METAL_DENSITY,
+                         radius: [550, 650],
+                         seed: generateRandomSeed(),
+                         temperature: [35, 40],
+                         waterHeight: [45, 60],
+                         waterDepth: 100,
+                    },
+                    { /* large temperate */
+                        biome: 'earth',
+                        biomeScale: 50,
+                        heightRange: [10, 30],
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [650, MAX_RADIUS_LARGE],
+                        seed: generateRandomSeed(),
+                        temperature: [35, 40],
+                        waterHeight: [35, 45],
+                        waterDepth: 100,
+                    }
+                ],
+
+                desert_start: [
+                    { /* small desert */
+                        biome: 'desert',
+                        biomeScale: 50,
+                        heightRange: [10, 30],
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [MIN_RADIUS_LARGE, 550],
+                        seed: generateRandomSeed(),
+                        temperature: [100, 100],
+                        waterHeight: [20, 45],
+                        waterDepth: 100,
+                    },
+                    { /* med desert */
+                         biome: 'desert',
+                         biomeScale: 50,
+                         heightRange: [10, 30],
+                         metalClusters: AVG_METAL_CLUSTERS,
+                         metalDensity: AVG_METAL_DENSITY,
+                         radius: [500, 650],
+                         seed: generateRandomSeed(),
+                         temperature: [100, 100],
+                         waterHeight: [20, 45],
+                         waterDepth: 100,
+                    },
+                    { /* naval desert */
+                         biome: 'desert',
+                         biomeScale: 50,
+                         heightRange: [20, 40],
+                         metalClusters: AVG_METAL_CLUSTERS,
+                         metalDensity: AVG_METAL_DENSITY,
+                         radius: [550, 650],
+                         seed: generateRandomSeed(),
+                         temperature: [100, 100],
+                         waterHeight: [45, 60],
+                         waterDepth: 100,
+                    },
+                    { /* large desert */
+                        biome: 'desert',
+                        biomeScale: 50,
+                        heightRange: [10, 30],
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [650, MAX_RADIUS_LARGE],
+                        seed: generateRandomSeed(),
+                        temperature: [100, 100],
+                        waterHeight: [20, 45],
+                        waterDepth: 100,
+                    }
+                ],
+
+                ice_start: [
+                    { /* small ice */
+                        biome: 'earth',
+                        biomeScale: 50,
+                        heightRange: [10, 30],
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [MIN_RADIUS_LARGE, 550],
+                        seed: generateRandomSeed(),
+                        temperature: 0,
+                        waterHeight: [20, 45],
+                        waterDepth: 100,
+                    },
+                    { /* med ice */
+                         biome: 'earth',
+                         biomeScale: 50,
+                         heightRange: [10, 30],
+                         metalClusters: AVG_METAL_CLUSTERS,
+                         metalDensity: AVG_METAL_DENSITY,
+                         radius: [500, 650],
+                         seed: generateRandomSeed(),
+                         temperature: 0,
+                         waterHeight: [20, 45],
+                         waterDepth: 100,
+                    },
+                    { /* naval ice */
+                         biome: 'earth',
+                         biomeScale: 50,
+                         heightRange: [20, 40],
+                         metalClusters: AVG_METAL_CLUSTERS,
+                         metalDensity: AVG_METAL_DENSITY,
+                         radius: [550, 650],
+                         seed: generateRandomSeed(),
+                         temperature: 0,
+                         waterHeight: [45, 60],
+                         waterDepth: 100,
+                    },
+                    { /* large ice */
+                        biome: 'earth',
+                        biomeScale: 50,
+                        heightRange: [10, 30],
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [650, MAX_RADIUS_LARGE],
+                        seed: generateRandomSeed(),
+                        temperature: 0,
+                        waterHeight: [20, 45],
+                        waterDepth: 100,
+                    }
+                ],
+
+                tropical_start: [
+                    { /* small tropical */
+                        biome: 'tropical',
+                        biomeScale: 50,
+                        heightRange: [20, 40],
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [MIN_RADIUS_LARGE, 550],
+                        seed: generateRandomSeed(),
+                        temperature: [60, 100],
+                        waterHeight: [40, 60],
+                        waterDepth: 100,
+                    },
+                    { /* med tropical */
+                         biome: 'tropical',
+                         biomeScale: 50,
+                         heightRange: [20, 40],
+                         metalClusters: AVG_METAL_CLUSTERS,
+                         metalDensity: AVG_METAL_DENSITY,
+                         radius: [500, 650],
+                         seed: generateRandomSeed(),
+                         temperature: [60, 100],
+                        waterHeight: [40, 60],
+                         waterDepth: 100,
+                    },
+                    { /* large tropical */
+                        biome: 'tropical',
+                        biomeScale: 50,
+                        heightRange: [20, 40],
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [650, MAX_RADIUS_LARGE],
+                        seed: generateRandomSeed(),
+                        temperature: [60, 100],
+                        waterHeight: [40, 60],
+                        waterDepth: 100,
+                    }
+                ],
+
+                lava_start: [
+                   { /* small lava */
+                       biome: 'lava',
+                       biomeScale: 50,
+                       heightRange: [10, 30],
+                       metalClusters: [AVG_METAL_CLUSTERS, MAX_METAL_CLUSTERS],
+                       metalDensity: [AVG_METAL_DENSITY, MAX_METAL_CLUSTERS],
+                       radius: [MIN_RADIUS_LARGE, 550],
+                       seed: generateRandomSeed(),
+                       temperature: 100,
+                       waterHeight: 35,
+                       waterDepth: 0,
+                   },
+                   { /* med lava */
+                       biome: 'lava',
+                       biomeScale: 50,
+                       heightRange: [10, 30],
+                       metalClusters: [AVG_METAL_CLUSTERS, MAX_METAL_CLUSTERS],
+                       metalDensity: [AVG_METAL_DENSITY, MAX_METAL_CLUSTERS],
+                       radius: [550, 650],
+                       seed: generateRandomSeed(),
+                       temperature: 0,
+                       waterHeight: [40, 45],
+                       waterDepth: 0,
+                   },
+                   { /* large lava */
+                       biome: 'lava',
+                       biomeScale: 50,
+                       heightRange: [10, 30],
+                       metalClusters: [AVG_METAL_CLUSTERS, MAX_METAL_CLUSTERS],
+                       metalDensity: [AVG_METAL_DENSITY, MAX_METAL_CLUSTERS],
+                       radius: [650, MAX_RADIUS_LARGE],
+                       seed: generateRandomSeed(),
+                       temperature: 100,
+                       waterHeight: [40, 45],
+                       waterDepth: 0,
+                   },
+                ],
+
+                normal_moon: [
+                    { /* tiny */
+                        biome: 'moon',
+                        biomeScale: 50,
+                        heightRange: [0, 5],
+                        metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                        metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                        radius: [MIN_RADIUS_SMALL, 275],
+                        seed: generateRandomSeed(),
+                        temperature: 0,
+                        waterHeight: 0,
+                        waterDepth: 0,
+                    },
+                    { /* small */
+                        biome: 'moon',
+                        biomeScale: 50,
+                        heightRange: [0, 10],
+                        metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                        metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                        radius: [275, 325],
+                        seed: generateRandomSeed(),
+                        temperature: 0,
+                        waterHeight: 0,
+                        waterDepth: 0,
+                    },
+                    { /* medium */
+                        biome: 'moon',
+                        biomeScale: 50,
+                        heightRange: [0, 10],
+                        metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                        metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                        radius: [325, MAX_RADIUS_SMALL],
+                        seed: generateRandomSeed(),
+                        temperature: 0,
+                        waterHeight: 0,
+                        waterDepth: 0,
+                    },
+                ],
+                lava_moon: [
+                    { /* tiny */
+                        biome: 'lava',
+                        biomeScale: 50,
+                        heightRange: [0, 10],
+                        metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                        metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                        radius: [MIN_RADIUS_SMALL, 275],
+                        seed: generateRandomSeed(),
+                        temperature: 100,
+                        waterHeight: [35, 40],
+                        waterDepth: 0,
+                    },
+                    { /* small */
+                        biome: 'lava',
+                        biomeScale: 50,
+                        heightRange: [0, 15],
+                        metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                        metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                        radius: [275, 325],
+                        seed: generateRandomSeed(),
+                        temperature: [40, 80],
+                        waterHeight: [35, 45],
+                        waterDepth: 0,
+                    },
+                    { /* medium */
+                        biome: 'lava',
+                        biomeScale: 50,
+                        heightRange: [0, 20],
+                        metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                        metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                        radius: [325, 375],
+                        seed: generateRandomSeed(),
+                        temperature: [40, 80],
+                        waterHeight: [35, 50],
+                        waterDepth: 0,
+                    }
+                ],
+                weird_moon: [
+                   { /* tiny */
+                       biome: 'tropical',
+                       biomeScale: 50,
+                       heightRange: [10, 30],
+                       metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                       metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                       radius: [MIN_RADIUS_SMALL, 275],
+                       seed: generateRandomSeed(),
+                       temperature: 0,
+                       waterHeight: [25, 35],
+                       waterDepth: 0,
+                   },
+                   { /* small forest moon */
+                       biome: 'tropical',
+                       biomeScale: 50,
+                       heightRange: [10, 30],
+                       metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                       metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                       radius: [275, 325],
+                       seed: generateRandomSeed(),
+                       temperature: [100],
+                       waterHeight: 30,
+                       waterDepth: 0,
+                   },
+
+                   { /* medium */
+                       biome: 'desert',
+                       biomeScale: 50,
+                       heightRange: [10, 30],
+                       metalClusters: [MIN_METAL_CLUSTERS, AVG_METAL_CLUSTERS],
+                       metalDensity: [MIN_METAL_DENSITY, AVG_METAL_DENSITY],
+                       radius: [325, 375],
+                       seed: generateRandomSeed(),
+                       temperature: 0,
+                       waterHeight: [0, 20],
+                       waterDepth: 0,
+                   },
+                ],
+                metal_start: [
+                    { /* large */
+                        biome: 'metal',
+                        biomeScale: 50,
+                        heightRange: 0,
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: 500,
+                        seed: generateRandomSeed(),
+                        temperature: [40, 80],
+                        waterHeight: 0,
+                        waterDepth: 0,
+                    },
+                    { /* large */
+                        biome: 'metal',
+                        biomeScale: 50,
+                        heightRange: 0,
+                        metalClusters: AVG_METAL_CLUSTERS,
+                        metalDensity: AVG_METAL_DENSITY,
+                        radius: [600, 800],
+                        seed: generateRandomSeed(),
+                        temperature: 0,
+                        waterHeight: 0,
+                        waterDepth: 0,
+                    },
+                ],
+                gas: [
+                    { /* medium */
+                        biome: 'gas',
+                        biomeScale: 50,
+                        heightRange: 0,
+                        metalClusters: 0,
+                        metalDensity: 0,
+                        radius: [1000, 1200],
+                        seed: generateRandomSeed(),
+                        temperature: [0, 75],
+                        waterHeight: 0,
+                        waterDepth: 0,
+                    },
+                    { /* large */
+                        biome: 'gas',
+                        biomeScale: 50,
+                        heightRange: 0,
+                        metalClusters: 0,
+                        metalDensity: 0,
+                        radius: [1400, 1600],
+                        seed: generateRandomSeed(),
+                        temperature: [25, 100],
+                        waterHeight: 0,
+                        waterDepth: 0,
+                    },
+                ]
+            };
+
+            self.sampleRange = function (range)
+            {
+                if (_.isString(range))
+                    return range;
+
+                if (range.length > 2)
+                    return _.sample(range);
+
+                if (range.length == 2) {
+                    if (_.isNumber(range[0]) && _.isNumber(range[1]))
+                        return _.random(range[0], range[1]);
+                    else
+                        return _.sample(range);
+                }
+
+                if (range.length == 1)
+                    return range[0];
+
+                return range;
+            }
+
+            self.createPlanet = function (description)
+            {
+                var result = _.cloneDeep(self.planets[description.type][description.size]);
+                result = _.mapValues(result, self.sampleRange);
+                return result;
+            };
+
+            /* this behavior should be wrapped into an UberUtility function, eventually */
+            self.pending = 0;
+            self.wait = $.Deferred();
+
+            self.watch = function (request)
+            {
+                self.pending++;
+
+                var deferred = $.Deferred();
+
+                request.then(function (value)
+                {
+                    deferred.resolve(value);
+
+                    self.pending--;
+
+                    if (self.pending === 0)
+                    {
+                        self.wait.resolve(true);
+                        self.wait = $.Deferred();
+                    }
+                });
+
+                return deferred.promise();
+            }
+
+            self.createSpec = function (description)
+            {
+                var result = _.mapValues(_.cloneDeep(description), self.sampleRange);
+                result.name = '';
+
+                var request = api.game.getRandomPlanetName();
+
+                self.watch(request).then(function (name)
+                {
+                    result.name = name;
+                });
+
+                var planet_description = _.mapValues(self.sampleRange(result.planet), self.sampleRange);
+
+                if (self.largeOption())
+                    planet_description.size = planet_description.size + 1;
+
+                result.planet = self.createPlanet(planet_description);
+
+                if (result.starting_planet)
+                {
+                    if (self.symmetricalOption())
+                    {
+                        result.planet.symmetricalMetal = !!self.symmetricalOption();
+                        result.planet.symmetricalStarts = !!self.symmetricalOption();
+                        result.planet.symmetryType = self.symmetricalOption() ? 'terrain and CSG' : 'none';
+                    }
+                }
+
+                return result;
+            };
+
+            self.createAsteroid = function()
+            {
+                var position = self.sampleRange(self.asteroidLocations);
+
+                var result = _.cloneDeep(self.asteroidTemplate);
+
+                result.position_x = position[0];
+                result.position_y = position[1];
+                result.velocity_x = position[2];
+                result.velocity_y = position[3];
+
+                return result;
+            }
+
+            self.createSystem = function(name)
+            {
+                var result =
+                {
+                    name: '',
+                    planets: []
+                }
+
+                var request = api.game.getRandomPlanetName();
+
+                self.watch(request).then(function (name)
+                {
+                    result.name = name;
+                });
+
+                var template = self.templates[name];
+
+                result.planets = _.map(template, self.createSpec);
+
+                if (self.asteroid())
+                {
+                    var asteroidSpec = self.createAsteroid();
+
+                    result.planets.push(asteroidSpec);
+                }
+
+                return result;
+            }
+
+            self.createdRandomSystems = ko.observable();
+
+            self.createRandomSystems = function()
+            {
+                var result = _.map(self.templateNames(), self.createSystem);
+
+                self.wait.then(function()
+                {
+                    self.createdRandomSystems(result);
+                });
+            };
+
+            self.createRandomSystemsRule = ko.computed(function()
+            {
+                self.symmetricalOption();
+                self.largeOption();
+                self.asteroid();
+
+                self.createRandomSystems();
+            });
+
+            self.processedRandomSystems = ko.computed(function()
+            {
+                return _.map(self.createdRandomSystems(), model.processSystem);
+            });
+        };
+
+        self.systemGenerator = new SystemGenerator(self);
+
+        self.showSystemPicker = ko.observable(false);
+
+        self.toggleSystemPicker = function()
+        {
+            self.showSystemPicker(!self.showSystemPicker());
+        }
+
+        self.loadedSystemIsCustom = ko.observable(false).extend({ session: 'loaded_system_is_custom' });
+        var loadedSystemIsCustomRule = ko.computed(function (value) {
+            if (!self.loadedSystemIsCustom())
+                return;
+
+            api.tally.incStatInt('custom_systems_used');
+            _.defer(function () { self.loadedSystemIsCustom(false); });
+        });
+
+        self.planetBiomes = ko.computed(function ()
+        {
+            if (!self.system() || !self.system().planets)
+                return [];
+
+            var ok = true;
+            var result = _.map(self.system().planets, function (element)
+            {
+                if (element && element.planet && element.planet.biome)
+                    return element.planet.biome;
+                ok = false;
+                return null;
+            });
+
+            return ok ? result : [];
+        });
+
+        self.biomes = ko.observableArray(['earth', 'moon', 'tropical', 'lava', 'metal', 'desert', 'gas']);
+        self.moonBiomes = ko.observableArray(['earth', 'moon', 'tropical', 'lava', 'desert']);
+        self.asteroidBiomes = ko.observableArray(['moon', 'lava']);
+
+        self.loadRandomSystem = function()
+        {
+
+            if (!self.premadeSystems().length)
+                return;
+
+            self.system(_.cloneDeep(_.sample(self.firstPickRandomSystems())));
+            self.updateSystem(self.system());
+            self.changeSettings();
+            self.requestUpdateCheatConfig();
+        };
+
+        self.chooseRandomSystem = function (index) {
+            self.showSystemPicker(false);
+            self.system(self.systemGenerator.createdRandomSystems()[index]);
+            self.updateSystem(self.system());
+            self.changeSettings();
+        };
+
+        self.imageSourceForPlanet = function (planet) {
+
+            var ice = planet.biome === 'earth' && planet.temperature <= -0.5;
+            var s = (ice) ? 'ice' : planet.biome;
+            s = (s) ? s : 'unknown';
+
+            return 'coui://ui/main/shared/img/' + s + '.png';
+        }
+
+        self.imageSizeForPlanet = function (size) {
+            return '' + 100 + 'px';
+        }
+
+        self.planetSizeClass = function (radius) {
+            if (radius <= 250)
+                return '1';
+            if (radius <= 450)
+                return '2';
+            if (radius <= 650)
+                return '3';
+            if (radius <= 850)
+                return '4';
+            return '5';
+        }
+
+        self.lastSceneUrl = ko.observable().extend({ session: 'last_scene_url' });
+
+        self.navToStart = function()
+        {
+            self.resetGameInfo();
+            self.transitPrimaryMessage(loc('!LOC:Returning to Main Menu'));
+            self.transitSecondaryMessage('');
+            self.transitDestination('coui://ui/main/game/start/start.html');
+            self.transitDelay(0);
+
+            window.location.href = 'coui://ui/main/game/transit/transit.html';
+        };
+
+        self.cancel = function()
+        {
+            self.navToStart();
+        };
+
+        self.colors = ko.observable([]);
+        self.secondaryColors = function (slot) {
+            var result = self.colors()[slot.colorIndex()];
+            return result ? result.secondary : [];
+        };
+
+        self.showColorPicker = ko.observable(false);
+        self.showSecondaryColorPicker = ko.observable(false);
+        self.colorPickerSlot = ko.observable(null);
+        self.showColorPickerForSlot = function (slot) {
+            return slot === self.colorPickerSlot();
+        };
+        self.toggleColorPickerSlot = function (slot, secondary) {
+            if (self.colorPickerSlot() === null)
+                self.colorPickerSlot(slot);
+            else
+                self.colorPickerSlot(null);
+
+            self.showColorPicker(self.colorPickerSlot() !== null);
+            self.showCommanderPicker(false);
+
+            if (secondary)
+                self.showSecondaryColorPicker(self.showColorPicker());
+            else
+                self.showSecondaryColorPicker(false);
+        };
+
+        self.showCommanderPicker = ko.observable(false);
+        self.toggleCommanderPicker = function ()
+        {
+            self.showAICommanderPicker(false);
+            self.showCommanderPicker(!self.showCommanderPicker());
+            model.showColorPicker(false);
+            model.colorPickerSlot(null);
+        };
+
+        self.showAICommanderPicker = ko.observable(false);
+        self.toggleAICommanderPicker = function (id)
+        {
+            self.selectedAI(id);
+            self.showCommanderPicker(false);
+            self.showAICommanderPicker(!self.showAICommanderPicker());
+            model.showColorPicker(false);
+            model.colorPickerSlot(null);
+        };
+
+        self.closeDropDowns = function () {
+            self.hideGwTechInspector();
+            self.showColorPicker(false);
+            self.showCommanderPicker(false);
+            self.showAICommanderPicker(false);
+            _.forEach(self.armies(), function(army) {
+                _.forEach(army.slots(), function(slot) {
+                    slot.closeGwTechPickers();
+                });
+            });
+        }
+
+        /** @deprecated */
+        self.activeModTextArray = ko.observableArray([]);
+        /** @deprecated */
+        self.activeCheatTextArray = ko.observableArray([]);
+
+        self.serverMods = ko.observableArray();
+        self.gameCheats = ko.observableArray();
+
+        self.hasServerMods = ko.computed(function() {
+            return self.serverMods().length > 0;
+        });
+
+        self.hasGameCheats = ko.computed(function() {
+            return self.gameCheats().length > 0;
+        });
+
+        /** @deprecated */
+        self.modDataSent = ko.observable(false);
+
+        /** @deprecated */
+        self.cheatAllowChangeVision = ko.observable(false).extend({ session: 'cheat_allow_change_vision' });
+        /** @deprecated */
+        self.cheatAllowChangeControl = ko.observable(false).extend({ session: 'cheat_allow_change_control' });
+        /** @deprecated */
+        self.cheatAllowCreateUnit = ko.observable(false).extend({ session: 'cheat_allow_create_unit' });
+        /** @deprecated */
+        self.cheatAllowModDataUpdates = ko.observable(false).extend({ session: 'cheat_allow_mod_data_updates' });
+
+        /** @deprecated */
+        self.setCheatsFromCheatConfig = function(config) {}
+        /** @deprecated */
+        self.requestUpdateCheatConfig = function() {}
+        /** @deprecated */
+        self.updateActiveModAndCheatText = function() {}
+
+        self.updateMountedServerMods = function()
+        {
+            api.mods.getMounted("server", true).then(function (mods)
+            {
+                if (mods)
+                {
+                    // even though we have gameModIdentifiers from beacon, etc we will update here
+
+                    var identifiers = [];
+
+                    mods = _.map(mods, function(mod)
+                    {
+                        if (!mod.description || ! mod.description.trim())
+                            mod.description = '';
+
+                        identifiers.push(mod.identifier);
+                        return mod;
+                    });
+
+                    model.gameModIdentifiers(identifiers);
+                    model.serverMods(mods);
+                    model.activeModTextArray(_.pluck(mods, 'display_name'));
+                }
+            });
+        }
+
+        /** @deprecated */
+        self.updateActiveCheatText = function() {}
+
+        self.showCommanderCinematic = ko.observable(false);
+
+        self.cinematicState = ko.computed(function()
+        {
+            if (!self.showCommanderCinematic())
+                return {};
+
+            return {
+                animate: true,
+                teams: _.invoke(self.armies(), 'cinematicInfo')
+            };
+        });
+
+        self.cinematicState.subscribe(function()
+        {
+            api.panels.cinematic && api.panels.cinematic.message('state', self.cinematicState());
+            _.delay(api.Panel.update);
+        });
+
+        // allow this to be moddable
+
+        self.setupAISkirmish = function()
+        {
+            if (!self.pushAIButton() || !self.isGameCreator() || self.armies().length < 2) {
+                return;
+            }
+
+            api.debug.log('setupAISkirmish');
+            if (self.armies()[1].slots()[0].isEmpty())
+            {
+                self.targetAIArmyIndex(1);
+                self.targetAISlotIndex(0);
+                self.addAI();
+            }
+        };
+
+        self.checkAISkirmish = ko.computed(function()
+        {
+            if (!self.pushAIButton() || !self.isGameCreator() || self.armies().length < 2)
+                return;
+
+            self.setupAISkirmish();
+
+            self.pushAIButton(false);
+
+        });
+
+        var passwordRevealed = ko.observable(false);
+        self.togglePasswordReveal = function() {
+            passwordRevealed(!passwordRevealed());
+        };
+        self.passwordInputType = ko.pureComputed(function() {
+            if (passwordRevealed())
+                return "text";
+            else
+                return "password";
+        });
+
+        self.localServerRecommended = ko.observable().extend({ session: 'local_server_recommended' });
+        self.offlineNotRecommendedDismissed = ko.observable(false).extend({ session: 'offline_not_recommended_warning_dismissed' });
+        self.showOfflineNotRecommended = ko.pureComputed(function() { return self.isLocalGame() && !self.localServerRecommended() && !self.offlineNotRecommendedDismissed(); });
+        self.dismissOfflineNotRecommended = function() { self.offlineNotRecommendedDismissed(true); };
+
+        self.resetLobbyInfo = function()
+        {
+            api.Panel.message('uberbar', 'lobby_info', undefined);
+        };
+
+        self.resetGameInfo = function()
+        {
+            self.reconnectToGameInfo(undefined);
+            self.resetLobbyInfo();
+        };
+
+        self.privateGamePassword.subscribe( function(password) {
+            api.Panel.message( 'uberbar', 'lobby_password', { password: password } );
+        });
+
+        self.lobbyFormat = ko.computed( function()
+        {
+            var format = '';
+
+            try {
+
+                var gameType = self.gameType();
+                var isTeamGame = self.isTeamGame();
+                var players = self.playerCount();
+                var armies = self.armies();
+
+                switch ( gameType ) {
+                    case 'FreeForAll': gameType = 'FFA'; break;
+                    case 'TeamArmies': gameType = 'Team'; break;
+                    case 'Galactic War': gameType = 'GW'; break;
+                    case 'Ladder1v1': gameType = 'Ranked'; break;
+                }
+
+                if ( players > 1 )
+                {
+                    if ( players == 2 )
+                    {
+                        format = '1v1';
+
+                        if ( gameType == 'Ranked' )
+                        {
+                            format = format + ' ' + gameType;
+                        }
+                    }
+                    else
+                    {
+                        format = players + ' ' + gameType;
+                    }
+
+                    var shared = false;
+
+                    if ( isTeamGame )
+                    {
+                        var counts = [];
+
+                        _.forEach( armies, function( army )
+                        {
+                            counts.push( army.slots().length );
+
+                            if ( ! army.alliance() )
+                            {
+                                shared = true;
+                            }
+                        });
+
+                        if ( players > 2 )
+                        {
+                            format = counts.join( 'v' ) + ' ' + ( shared ? 'shared' : 'unshared' );
+                        }
+                    }
+
+                }
+            }
+            catch ( e ) {
+                console.error( JSON.stringify( e ) );
+            }
+
+            return format;
+
+        }).extend({
+            rateLimit: 1000
+        });
+
+        self.lobbyStatus = ko.computed( function()
+        {
+            var status = '';
+
+            try
+            {
+
+                var format = self.lobbyFormat();
+
+                if ( !format ) {
+                    return '';
+                }
+
+                var isGameCreator = self.isGameCreator();
+                var requiredContent = self.requiredContent();
+                var players = self.playerCount();
+                var emptySlots = self.numberOfEmptySlots();
+
+                var items = [];
+
+                items.push( isGameCreator ? 'Hosting' : 'Joined' );
+
+                if ( ! requiredContent ) {
+                    items.push('classic');
+                }
+
+                items.push(format);
+
+                if (emptySlots == 0) {
+                    items.push( '(full)' );
+                }
+                else if ( players > 2 && emptySlots > 0 ) {
+                    items.push('(' + emptySlots + ' more)');
+                }
+
+                var status = items.join(' ');
+
+                self.sendLobbyStatus(status);
+
+            }
+            catch ( e ) {
+                console.error( JSON.stringify( e ) );
+            }
+
+            return status;
+
+        }).extend({
+            rateLimit: 1000
+        });
+
+        self.sendLobbyStatus = function(status) {
+            api.Panel.message( 'uberbar', 'lobby_status', { status: status } );
+        }
+
+// update the timestamp in reconnect to game info every minute
+        self.updateReconnectToGameInfoTimestamp = function() {
+            var reconnectToGameInfo = self.reconnectToGameInfo();
+            if (!reconnectToGameInfo) {
+                return;
+            }
+            reconnectToGameInfo.timestamp = Date.now();
+            self.reconnectToGameInfo.valueHasMutated();
+            setTimeout(self.updateReconnectToGameInfoTimestamp, 60*1000);
+        }
+        self.updateReconnectToGameInfoTimestamp();
+
+        self.jsonMessageHandlers = {}
+
+        self.registerJsonMessageHandler = function(identifier, handler, priority) {
+            if (!identifier || !handler) {
+                return false;
+            }
+            var registeredJsonMessageHandlers = self.jsonMessageHandlers[identifier];
+
+            if (!registeredJsonMessageHandlers) {
+                registeredJsonMessageHandlers = [];
+                self.jsonMessageHandlers[identifier] = registeredJsonMessageHandlers;
+            }
+
+            registeredJsonMessageHandlers.push({ handler: handler, priority: priority || 100});
+
+            return true;
+        };
+
+        self.unregisterJsonMessageHandler = function(identifier, handler) {
+            if (!identifier || !handler) {
+                return false;
+            }
+            var registeredJsonMessageHandlers = self.jsonMessageHandlers[identifier];
+
+            if (!registeredJsonMessageHandlers) {
+                return false;
+            }
+
+            var found = false;
+
+            _.remove(registeredJsonMessageHandlers, function(registeredJsonMessageHandler) {
+                var remove = registeredJsonMessageHandler.handler === handler;
+                if (remove) {
+                    found = true;
+                }
+                return remove;
+            });
+
+            return found;
+        };
+
+        self.sendJsonMessage = function(payload) {
+            if (!payload.identifier) {
+                return false;
+            }
+            model.send_message("json_message", payload);
+        }
+
+        self.requestChatHistory = function() {
+            model.send_message("chat_history", {}, function(sucesss, response) {
+                if (sucesss && response && response.chat_history) {
+                    _.forEach(response.chat_history, function(msg) {
+                        model.chatMessages.push(new ChatMessageViewModel(msg.player_name, 'lobby', msg.message));
+                    });
+                }
+            });
+        }
+
+        self.armyIndex = ko.observable();
+        self.draggingPlayerId = ko.observable();
+        self.draggingArmyIndex = ko.observable();
+
+        self.movePlayer = function(playerId, armyId)
+        {
+            if (!self.isGameCreator())
+                return;
+
+            model.send_message('move_player',
+            {
+                player: playerId,
+                army: armyId
+            });
+        }
+
+        self.swapPlayers = function(player1, player2)
+        {
+            if (!self.isGameCreator())
+                return;
+
+            model.send_message('swap_players',
+            {
+                player1: player1,
+                player2: player2
+            });
+        }
+
+        self.makeSpectator = function (player)
+        {
+            if (!self.isGameCreator())
+                return;
+
+            self.send_message('make_spectator', { player: player });
+        };
+
+        self.whenPlanetsAreReady = function()
+        {
+            self.clientLoading(false);
+        }
+
+        self.setupWhenPlanetsAreReady = function()
+        {
+            _.delay(function()
+            {
+                api.getWorldView(0).whenPlanetsReady().then(self.whenPlanetsAreReady);
+            }, 200);
+        }
+
+        self.setup = function()
+        {
+            if (model.tryToSpectate())
+            {
+                model.leaveArmy({ force: true });
+                model.tryToSpectate(false);
+            }
+
+            model.requestUpdateCheatConfig();
+
+            model.requestChatHistory();
+
+            if (!model.loadedSystemIsEmpty())
+            {
+                model.system(model.loadedSystem());
+                model.updateSystem(model.system());
+                model.loadedSystem({});
+            }
+
+            model.setupWhenPlanetsAreReady();
+        }
+    }
+
+    var CmdButtons = {};
+    CmdButtons[loc("!LOC:Help")] = function() {
+        var link = "https://planetaryannihilation.com/guides/hosting-a-local-server/";
+        engine.call('web.launchPage', link);
+    };
+
+    CmdButtons[loc("!LOC:OK")] = function () {
+        $(this).dialog("close");
+        model.showUPnPError(false);
+        model.mode(1);
+    };
+
+    $("#error").dialog({
+        dialogClass: "upnp_notification",
+        draggable: false,
+        resizable: false,
+        width: 600,
+        modal: true,
+        autoOpen: false,
+        buttons: CmdButtons
+    });
+
+    model = new NewGameViewModel();
+
+    handlers = {};
+
+    handlers.game_config = function (payload) { /* deprecated. */
+        /* ignore if we created the game, since it is just an echo */
+        if (model.isGameCreator() || _.isEmpty(payload))
+            return;
+
+        model.createdGameDesc(payload);
+    }
+
+    handlers.chat_message = function (msg) {
+        model.chatMessages.push(new ChatMessageViewModel(msg.player_name, 'lobby', msg.message));
+    };
+
+    handlers.json_message = function (jsonMsg)
+    {
+        api.debug.log(JSON.stringify(jsonMsg));
+
+        var payload = jsonMsg.payload;
+
+        if (!payload)
+            return;
+
+        var identifier = payload.identifier;
+
+        if (!identifier)
+            return;
+
+        var handlers = model.jsonMessageHandlers[identifier];
+        if (handlers)
+        {
+            try
+            {
+                _.forEach(handlers, function(handlerObj)
+                {
+                    var handler = handlerObj.handler;
+                    if (_.isFunction(handler))
+                        handler(jsonMsg);
+                });
+            }
+            catch (e)
+            {
+                console.trace(JSON.stringify(e, null, 2));
+            }
+        }
+    };
+
+    handlers.event_message = function (payload)
+    {
+        switch (payload.type) {
+            case 'countdown':
+                model.showCommanderCinematic(true);
+
+                if (Number(payload.message) === 1)
+                    api.audio.playSound('/SE/UI/UI_lobby_count_down_last');
+                else if (Number(payload.message) > 1)
+                    api.audio.playSound('/SE/UI/UI_lobby_count_down');
+
+                model.startingGameCountdown(Number(payload.message))
+                break;
+
+            case 'settings':
+                api.debug.log(payload);
+                var msg = payload.message.charAt(0).toUpperCase() + payload.message.slice(1);
+                model.chatMessages.push(new ChatMessageViewModel('server', 'settings', msg));
+                break;
+
+            default:
+                model.chatMessages.push(new ChatMessageViewModel('server', 'server', payload.target + payload.message));
+                break;
+        }
+    };
+
+    handlers.request_client_mod_manifest = function() {
+        api.mods.getMounted('client', true).then(function(mountedMods) {
+            model.send_message('client_mod_manifest', buildClientModManifest(mountedMods));
+        }, function() {
+            model.send_message('client_mod_manifest', {
+                active_identifiers: [],
+                active_required_identifiers: [],
+                active_required_names_by_id: {}
+            });
+        });
+    };
+
+    handlers.required_client_mods_missing = function(payload) {
+        console.error('[GW TECH] Client mod mismatch for custom lobby tech cards: ' + JSON.stringify(payload || {}));
+        model.gwTechLaunchInProgress(false);
+    };
+
+    handlers.all_client_mods_match = function(payload) {
+        console.log('[GW TECH] Client mod manifest accepted: ' + JSON.stringify(payload || {}));
+    };
+
+    handlers.gw_tech_config = function(payload) {
+        model.mountGwTechConfig(payload).then(function() {
+            console.log('[GW TECH] Mounted custom lobby tech-card config.');
+        }, function(reason) {
+            console.error('[GW TECH] Failed mounting custom lobby tech-card config: ' + JSON.stringify(reason));
+        });
+    };
+
+    handlers.colors = function (payload) {
+        var fn = function (color) {
+            return 'rgb(' + color.join() + ')';
+        };
+
+        var result = _.map(payload, function (element) {
+            return {
+                taken: element.taken,
+                color: fn(element.primary),
+                secondary: _.map(element.secondary, fn)
+            };
+        });
+
+        model.colors(result);
+    }
+    var prev_players = {};
+
+    handlers.players = function (payload, force)
+    {
+        prev_players = payload;
+
+        var orphans = [];
+        var contacts = [];
+
+        _.invoke(model.armies(), 'dirtySlots');
+
+        var ready = true;
+
+        _.forEach(payload, function (element)
+        {
+            var isCurrentPlayer = element.id === model.uberId() || element.id === model.displayName();
+
+            if (element.creator && isCurrentPlayer)
+            {
+                model.isGameCreator(true);
+
+//                 if (!model.modDataSent() && !window.gNoMods) {
+//                     model.send_message('mod_data_available', {}, function (success, response) {
+//                         api.debug.log('mod_data_available');
+//                         if (success) {
+//                             api.debug.log('server mods uploading');
+//                             model.serverModsState('uploading');
+//                             api.mods.sendModFileDataToServer(response.auth_token).then( function(data) {
+//                                 api.debug.log('server mods uploaded');
+//                                 api.debug.log(data);
+//                             });
+//                         }
+//                         else {
+// // a refresh, selecting system or settings clears everything
+//                             api.debug.log(response);
+//                             if( !model.serverModsState()) {
+//                                 model.serverModsState('mounted');
+//                                 model.updateMountedServerMods();
+//                             }
+//                         }
+//                     });
+//                     model.modDataSent(true);
+//                 }
+            }
+            else if (!window.gNoMods)
+            {
+// non hosts already have server mods mounted during connect
+                if( !model.serverModsState())
+                {
+                    model.serverModsState('mounted');
+                    model.updateMountedServerMods();
+                }
+            }
+
+            // if (element.name === model.displayName()) {
+            if (isCurrentPlayer)
+            {
+                model.armyIndex(element.army_index);
+
+                if (!element.ready && model.thisPlayerIsReady())
+                {
+                    api.audio.playSound('/SE/UI/UI_lobby_made_unready');
+                }
+                model.thisPlayerIsReady(element.ready);
+            }
+
+            if (element.army_index !== -1 && model.armies().length > element.army_index)
+            {
+                model.armies()[element.army_index].addPlayer(element.slot_index, element);
+
+                if (!element.creator && !element.ai && (!element.ready || element.loading))
+                    ready = false;
+            }
+            else
+                orphans.push(element);
+
+            contacts.push(element.id);
+        });
+
+        _.invoke(model.armies(), 'cleanupSlots');
+        model.playersWithoutArmies(orphans);
+        model.spectators(orphans);
+
+        model.lobbyContacts(contacts);
+
+        model.allPlayersAreReady(ready);
+    }
+
+    /* from server_state.data.armies */
+    handlers.armies = function (payload, force)
+    {
+        while (model.armies().length > payload.length)
+            model.armies.pop();
+
+        _.forEach(model.armies(), function (army, index) {
+            army.updateFromJson(payload[index]);
+        });
+
+        while (model.armies().length < payload.length)
+            model.armies.push(new ArmyViewModel(model.armies().length, payload[model.armies().length]));
+
+        handlers.players(prev_players);
+    }
+
+    handlers.control = function (payload)
+    {
+        if (!payload.has_first_config && model.isGameCreator())
+            model.resetArmies();
+
+        model.serverReady(payload.sim_ready);
+
+        if (payload.system_ready)
+            model.updateSystemInProgress(true);
+    };
+
+    handlers.settings = function (payload) {
+        model.isFriendsOnlyGame(!!payload.friends);
+        model.isPublicGame(!!payload.public);
+        model.requiredContent(payload.required_content);
+
+        if ( payload.max_players )
+            model.maxPlayersLimit( payload.max_players );
+
+        if ( payload.max_spectators )
+            model.maxSpectatorsLimit( payload.max_spectators );
+
+        model.spectatorLimitLock(true);
+        model.spectatorLimit(payload.spectators);
+        model.spectatorLimitLock(false);
+
+        model.tagLock(true);
+        model.tag(payload.tag);
+        model.tagLock(false);
+
+        model.gameNameLock(true);
+        model.gameName(payload.game_name);
+        model.gameNameLock(false);
+
+        model.dynamicAlliances(payload.game_options ? !!payload.game_options.dynamic_alliances : false);
+        model.dynamicAllianceVictory(payload.game_options ? !!payload.game_options.dynamic_alliance_victory : false);
+
+        model.eradicationMode(payload.game_options ? !!payload.game_options.eradication_mode : false);
+        model.eradicationModeSubCommanders(payload.game_options ? !!payload.game_options.eradication_mode_sub_commanders : false);
+        model.eradicationModeFactories(payload.game_options ? !!payload.game_options.eradication_mode_factories : false);
+        model.eradicationModeFabricators(payload.game_options ? !!payload.game_options.eradication_mode_fabricators : false);
+
+        if (_.has(payload, 'game_options'))
+        {
+            model.bountyModeLock(true);
+            model.bountyMode(!!payload.game_options.bounty_mode);
+            model.bountyModeLock(false);
+        }
+
+        if (_.has(payload, 'game_options') && _.has(payload.game_options, 'bounty_value'))
+        {
+            model.bountyValueLock = true;
+            model.bountyValue(payload.game_options.bounty_value);
+            model.bountyValueLock = false;
+        }
+        model.sandbox(payload.game_options ? !!payload.game_options.sandbox : false);
+        if (payload.game_options)
+            model.gameType(payload.game_options.game_type);
+
+        model.listenToSpectators(payload.game_options ? payload.game_options.listen_to_spectators : false);
+        model.landAnywhere(payload.game_options ? payload.game_options.land_anywhere : false);
+
+        model.suddenDeathMode(payload.game_options ? payload.game_options.sudden_death_mode : false);
+
+        model.shuffleLandingZones(payload.game_options ? payload.game_options.shuffle_landing_zones : false);
+
+        model.gwTechCardSlotCountLock(true);
+        model.gwTechCardSlotCount(payload.game_options ? normalizeGwTechSlotCount(payload.game_options.gw_tech_card_slots) : 0);
+        model.gwTechCardSlotCountLock(false);
+
+        model.requestUpdateCheatConfig();
+    };
+
+    handlers.system = function (payload)
+    {
+        if (!_.isEmpty(payload))
+            model.clientLoading(true);
+
+        var unfixedSystem = UberUtility.unfixupPlanetConfig(payload);
+
+
+        if (unfixedSystem && !unfixedSystem.name)
+            unfixedSystem.name = loc(model.isGameCreator() ? '!LOC:Select a system' : '!LOC:Waiting for system');
+
+        model.system(unfixedSystem);
+    };
+
+    handlers.server_state = function (payload)
+    {
+        if (payload.url && !window.location.href.startsWith(payload.url))
+        {
+            // Transitioning can take a little while.  Don't show a dirty page while we do that.
+            $('body').hide();
+            window.location.href = payload.url;
+            return; /* window.location.href will not stop execution. */
+        }
+
+        if (payload.data) {
+            handlers.armies(payload.data.armies, true);
+            handlers.players(payload.data.players, model.armies().length !== 0);
+            handlers.colors(payload.data.colors);
+            handlers.control(payload.data.control);
+            handlers.settings(payload.data.settings);
+            handlers.system(payload.data.system);
+        }
+    };
+
+    /**
+     * @engine signal
+     */
+    handlers.connection_disconnected = function()
+    {
+        if (model.userTriggeredDisconnect())
+            return;
+
+        console.error('disconnected');
+
+        // does not reset reconnect to game info
+
+        model.resetLobbyInfo();
+        model.transitPrimaryMessage(loc('!LOC:CONNECTION TO SERVER LOST'));
+        model.transitSecondaryMessage(loc('!LOC:Returning to Main Menu'));
+        model.transitDestination('coui://ui/main/game/start/start.html');
+        model.transitDelay(5000);
+
+        window.location.href = 'coui://ui/main/game/transit/transit.html';
+    }
+
+    handlers.friends = function (payload)
+    {
+        model.friends(payload);
+    }
+
+    handlers.blocked = function (payload)
+    {
+        model.blocked(payload);
+    }
+
+    /** @deprecated */
+    handlers.downloading_mod_data = function(payload) {}
+
+    /** @deprecated */
+    handlers.mount_mod_file_data = function() {}
+
+    /** @deprecated */
+    handlers.server_mod_info_updated = function() {}
+
+    /** @deprecated */
+    handlers.set_cheat_config = function() {}
+
+    handlers['panel.invoke'] = function(params) {
+        var fn = params[0];
+        var args = params.slice(1);
+        return model[fn] && model[fn].apply(model, args);
+    };
+
+    handlers.sim_created = function()
+    {
+        model.clientLoading(true);
+        model.setupWhenPlanetsAreReady();
+    }
+
+    model.lastSceneUrl('coui://ui/main/game/new_game/new_game.html');
+
+    if (window.CommunityMods)
+    {
+        try
+        {
+            CommunityMods();
+        }
+        catch (e)
+        {
+            console.trace(JSON.stringify(e, null, 2));
+        }
+    }
+
+    loadSceneMods('new_game');
+
+    app.registerWithCoherent(model, handlers);
+
+    ko.applyBindings(model);
+
+    api.Panel.message('uberbar', 'request_friends');
+    api.Panel.message('uberbar', 'request_blocked');
+
+    $("#radio").buttonset();
+
+    $('body').keydown(function (event)
+    {
+        if (event.keyCode === keyboard.esc)
+        {
+            if (model.chatSelected())
+                model.chatSelected(false);
+        }
+        else if (event.keyCode === keyboard.enter)
+        {
+            if (model.chatSelected())
+                $(".chat_input_form").submit();
+
+            model.chatSelected(true);
+        }
+    });
+
+    app.hello(handlers.server_state, handlers.connection_disconnected);
+
+    model.setup();
+
+});
