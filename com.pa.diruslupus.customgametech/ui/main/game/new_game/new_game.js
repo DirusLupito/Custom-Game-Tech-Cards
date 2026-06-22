@@ -480,6 +480,52 @@ $(document).ready(function()
         return trimmed.toLowerCase();
     };
 
+    var formatGwTechLogValue = function(value) {
+        if (value === undefined) {
+            return 'undefined';
+        }
+
+        if (value === null) {
+            return 'null';
+        }
+
+        if (_.isString(value)) {
+            return value;
+        }
+
+        if (value && value.stack) {
+            return String(value.stack);
+        }
+
+        if (value && value.message) {
+            return String(value.message);
+        }
+
+        if (value && (_.has(value, 'status') || _.has(value, 'statusText') || _.has(value, 'responseText'))) {
+            var parts = [];
+            if (_.has(value, 'status')) {
+                parts.push('status=' + value.status);
+            }
+            if (_.has(value, 'statusText')) {
+                parts.push('statusText=' + value.statusText);
+            }
+            if (_.has(value, 'responseText')) {
+                parts.push('responseText=' + String(value.responseText).substring(0, 512));
+            }
+            return parts.join(' ');
+        }
+
+        try {
+            return JSON.stringify(value);
+        } catch (e) {
+            try {
+                return String(value);
+            } catch (stringError) {
+                return '[unprintable value]';
+            }
+        }
+    };
+
     var getRequiredGwScenesForMod = function(mod) {
         var scenes = mod && mod.scenes;
         if (!scenes || !_.isObject(scenes)) {
@@ -654,46 +700,46 @@ $(document).ready(function()
 
         communityModsManager.installedMods.valueHasMutated();
 
-        communityModsManager.remountClientMods().always(function() {
+        var restoreClientMods = function(onRestored, originalReason) {
+            _.forEach(installedMods, function(mod) {
+                if (!mod || mod.context !== 'client') {
+                    return;
+                }
+
+                var identifier = normalizeModIdentifier(mod.identifier);
+                if (!identifier || !_.has(clientEnabledBefore, identifier)) {
+                    return;
+                }
+
+                mod.enabled = clientEnabledBefore[identifier];
+            });
+
+            communityModsManager.installedMods.valueHasMutated();
+            communityModsManager.remountClientMods().then(function() {
+                onRestored();
+            }, function(restoreReason) {
+                done.reject('Unable to restore client mods after tech-card cook: ' +
+                    formatGwTechLogValue(restoreReason) +
+                    (originalReason ? ('; original reason: ' + formatGwTechLogValue(originalReason)) : ''));
+            });
+        };
+
+        communityModsManager.remountClientMods().then(function() {
             $.when(work()).then(function() {
                 var workArgs = arguments;
-                _.forEach(installedMods, function(mod) {
-                    if (!mod || mod.context !== 'client') {
-                        return;
-                    }
-
-                    var identifier = normalizeModIdentifier(mod.identifier);
-                    if (!identifier || !_.has(clientEnabledBefore, identifier)) {
-                        return;
-                    }
-
-                    mod.enabled = clientEnabledBefore[identifier];
-                });
-
-                communityModsManager.installedMods.valueHasMutated();
-                communityModsManager.remountClientMods().always(function() {
+                restoreClientMods(function() {
                     done.resolve.apply(done, workArgs);
                 });
             }, function() {
                 var workArgs = arguments;
-                _.forEach(installedMods, function(mod) {
-                    if (!mod || mod.context !== 'client') {
-                        return;
-                    }
-
-                    var identifier = normalizeModIdentifier(mod.identifier);
-                    if (!identifier || !_.has(clientEnabledBefore, identifier)) {
-                        return;
-                    }
-
-                    mod.enabled = clientEnabledBefore[identifier];
-                });
-
-                communityModsManager.installedMods.valueHasMutated();
-                communityModsManager.remountClientMods().always(function() {
+                restoreClientMods(function() {
                     done.reject.apply(done, workArgs);
-                });
+                }, workArgs[0]);
             });
+        }, function(reason) {
+            restoreClientMods(function() {
+                done.reject('Unable to mount required client mods for tech-card cook: ' + formatGwTechLogValue(reason));
+            }, reason);
         });
 
         return done.promise();
@@ -2633,28 +2679,27 @@ $(document).ready(function()
                 return done.promise();
             }
 
-            self.publishRequiredClientModsForGwTech().then(function(requiredIdentifiers) {
-                runWithRequiredClientModsOnly(requiredIdentifiers || [], function() {
-                    var cookDone = $.Deferred();
-
-                    requireGW(['shared/gw_custom_lobby_tech_referee'], function(GWCustomLobbyTechReferee) {
+            requireGW(['shared/gw_custom_lobby_tech_referee'], function(GWCustomLobbyTechReferee) {
+                self.publishRequiredClientModsForGwTech().then(function(requiredIdentifiers) {
+                    runWithRequiredClientModsOnly(requiredIdentifiers || [], function() {
+                        var cookDone = $.Deferred();
                         GWCustomLobbyTechReferee.cook(owners).then(function(config) {
                             cookDone.resolve(config);
                         }, function(reason) {
                             cookDone.reject(reason);
                         });
-                    }, function(reason) {
-                        cookDone.reject(reason || 'Failed to load custom lobby tech referee.');
-                    });
 
-                    return cookDone.promise();
-                }).then(function(config) {
-                    done.resolve(config);
+                        return cookDone.promise();
+                    }).then(function(config) {
+                        done.resolve(config);
+                    }, function(reason) {
+                        done.reject(reason);
+                    });
                 }, function(reason) {
                     done.reject(reason);
                 });
             }, function(reason) {
-                done.reject(reason);
+                done.reject(reason || 'Failed to load custom lobby tech referee.');
             });
 
             return done.promise();
@@ -3624,8 +3669,8 @@ $(document).ready(function()
             self.cookGwTechConfig().then(function(config) {
                 self.send_message('set_gw_tech_config', config, function(success, response) {
                     if (!success) {
-                        console.error('[GW TECH] set_gw_tech_config failed: ' + JSON.stringify(response || {}));
                         self.gwTechLaunchInProgress(false);
+                        console.error('[GW TECH] set_gw_tech_config failed: ' + formatGwTechLogValue(response));
                         return;
                     }
 
@@ -3633,14 +3678,14 @@ $(document).ready(function()
                         countdown: 5
                     }, function(startSuccess, startResponse) {
                         if (!startSuccess) {
-                            console.error('[GW TECH] start_game failed: ' + JSON.stringify(startResponse || {}));
                             self.gwTechLaunchInProgress(false);
+                            console.error('[GW TECH] start_game failed: ' + formatGwTechLogValue(startResponse));
                         }
                     });
                 });
             }, function(reason) {
-                console.error('[GW TECH] Failed to cook tech-card config: ' + JSON.stringify(reason));
                 self.gwTechLaunchInProgress(false);
+                console.error('[GW TECH] Failed to cook tech-card config: ' + formatGwTechLogValue(reason));
             });
         };
 
@@ -5398,19 +5443,19 @@ api.debug.log(personality);
     };
 
     handlers.required_client_mods_missing = function(payload) {
-        console.error('[GW TECH] Client mod mismatch for custom lobby tech cards: ' + JSON.stringify(payload || {}));
         model.gwTechLaunchInProgress(false);
+        console.error('[GW TECH] Client mod mismatch for custom lobby tech cards: ' + formatGwTechLogValue(payload));
     };
 
     handlers.all_client_mods_match = function(payload) {
-        console.log('[GW TECH] Client mod manifest accepted: ' + JSON.stringify(payload || {}));
+        console.log('[GW TECH] Client mod manifest accepted: ' + formatGwTechLogValue(payload));
     };
 
     handlers.gw_tech_config = function(payload) {
         model.mountGwTechConfig(payload).then(function() {
             console.log('[GW TECH] Mounted custom lobby tech-card config.');
         }, function(reason) {
-            console.error('[GW TECH] Failed mounting custom lobby tech-card config: ' + JSON.stringify(reason));
+            console.error('[GW TECH] Failed mounting custom lobby tech-card config: ' + formatGwTechLogValue(reason));
         });
     };
 

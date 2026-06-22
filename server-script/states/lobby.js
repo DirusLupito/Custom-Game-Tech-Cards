@@ -1169,6 +1169,7 @@ function LobbyModel(creator) {
                 return;
             }
 
+            self.gwTechConfigReadyByClientId[targetClient.id] = false;
             targetClient.message({
                 message_type: 'gw_tech_config',
                 payload: {
@@ -1178,7 +1179,6 @@ function LobbyModel(creator) {
                     gw_tech_cards_active: true
                 }
             });
-            self.gwTechConfigReadyByClientId[targetClient.id] = false;
         };
 
         if (client)
